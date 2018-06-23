@@ -6,11 +6,14 @@ from flask import json
 from datetime import datetime
 
 class MainModel:
-    pass
+    def toJSON(self):
+        return json.loads(json.dumps(self, default=lambda o: o.strftime("%Y-%m-%d %H:%M:%S") if isinstance(o, datetime)
+                          else o.__dict__,
+                          sort_keys=True, indent=4))
 
 class User(MainModel):
     
-    def __init__(self, name, username, email, password, role, registered_on=datetime.now()):
+    def __init__(self, name, username, email, password, role, registered_on=datetime.utcnow().isoformat()):
         self.name = name
         self.username = username
         self.email = email

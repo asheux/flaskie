@@ -1,11 +1,11 @@
 import logging
 
-from flask import request
+from flask import request, jsonify
 from flask_restplus import Resource
 from ..parsers import pagination_arguments
 from flaskie.api.restplus import api
 from flaskie.api.v1.models import User
-from ..serializers import user, page_of_users
+from ..serializers import user, page_of_users, Pagination
 from ..collections import create_user, get_all_users
 
 log = logging.getLogger(__name__)
@@ -15,32 +15,27 @@ ns = api.namespace('users', description='User operations')
 class UsersCollection(Resource):
     @api.doc('Get a list of users')
     @api.expect(pagination_arguments)
-    @api.marshal_with(page_of_users)
+    @api.marshal_list_with(page_of_users)
     def get(self):
         """Return list of users"""
-        args = pagination_arguments.parse_args(request)
+        args = pagination_arguments.parse_args(strict=True)
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        users_query = get_all_users
-        users_page = users_query.paginate(page, per_page, error_out=False)
+        users_query = get_all_users()
+        paginate = Pagination(page, per_page, len(users_query))
+        result = [{k:v for k, v in [(k,v) for item in users_query for k, v in item.items()]}]
+        response = {
+            "page": paginate.page,
+            "per_page": paginate.per_page,
+            "total": paginate.total_count,
+            "data": result
+        }
+        return response, 200
 
-        return users_page
     @api.doc(pagination_arguments)
-    @api.expect(user)
-    @api.marshal_with(user, code=201)
+    @api.response(201, 'User created successfully')
+    @api.expect(user, validate=True)
     def post(self):
         """Creates a new user"""
-        result = request.json
-        name = result.get('name')
-        username = result.get('username')
-        email = result.get('email')
-        password = result.get('password')
-        role = result.get('role')
-
-        user = User(name, username, email, password, role)
-        new_user = create_user(user)
-        response = {
-            "status": "success",
-            "message": "new user created"
-        }
-        return response, 201
+        data = request.json
+        return create_user(data=data)
