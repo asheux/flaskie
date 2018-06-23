@@ -6,7 +6,7 @@ class Configuration:
     """The main app configurations"""
     DEBUG = False
     TESTING = False
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'security is delicate'
+    SECRET_KEY = os.getenv('SECRET_KEY', 'security is delicate')
     FLASKIE_ADMIN = os.environ.get('FLASKIE_ADMIN')
 
     @staticmethod
