@@ -53,5 +53,5 @@ pagination = api.model('A page of results', {
 })
 
 page_of_users = api.inherit('Page of users', pagination, {
-    'data': fields.Nested(user, description='Array of users')
+    'data': fields.List(fields.Nested(user, description='Array of users'))
 })
