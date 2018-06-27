@@ -13,7 +13,8 @@ A simple flask api to handle user authentication based on Flask and flask-RESTPl
 
 # Installation and Setup
 Clone the repository.
-```bash
+
+```
 git clone https://github.com/asheuh/flaskie
 ```
 ## Navigate to the API folder
@@ -41,7 +42,7 @@ venv\Scripts\activate
 ## Install requirements( with pip)
 
 ```
-$ pip install -r requirements.txt
+$ pip install -r requirements/dev.txt
 ```
 
 ## Running the application
