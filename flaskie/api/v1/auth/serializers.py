@@ -36,13 +36,16 @@ class Pagination(object):
                 last = num
 
 
-user = api.model('User API', {
+user_register = api.model('Register Model', {
     'name': fields.String(required=True, description='User fullname'),
     'username': fields.String(required=True, description='Username'),
     'email': fields.String(required=True, description='The user\'s email address'),
     'password_hash': fields.String(required=True, description='The users secret password'),
-    'registered_on': fields.DateTime,
-    'role': fields.String(required=True, description='The role of users i the application'),
+})
+
+user_login = api.model('Login Model', {
+    'username': fields.String(required=True, description='Your username'),
+    'password': fields.String(required=True, description='Your password'),
 })
 
 pagination = api.model('A page of results', {
@@ -53,5 +56,5 @@ pagination = api.model('A page of results', {
 })
 
 page_of_users = api.inherit('Page of users', pagination, {
-    'data': fields.List(fields.Nested(user, description='Array of users'))
+    'data': fields.List(fields.Nested(user_register, description='Array of users'))
 })

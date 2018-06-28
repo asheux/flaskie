@@ -15,7 +15,6 @@ class UserStore:
         username = data['username']
         email = data['email']
         password = data['password_hash']
-        role = data['role']
         errors = user_is_valid(data)
 
         if check_valid_email(email) is None:
@@ -32,14 +31,15 @@ class UserStore:
             }
             return response
         else:
-            user = User(name, username, email, password, role)
-            
-            db[self.counter] = user.toJSON()
+            user = User(name, username, email, password)
+            you_id = username + '00%d' % self.counter
+            db[you_id] = user.toJSON()
             self.counter += 1
 
             response = {
                 'status': 'success',
                 'message': 'Successfully registered',
+                'your ID': self.get_the_user_id(),
                 'new_user': user.toJSON()
             }
             return response, 201
@@ -48,7 +48,9 @@ class UserStore:
     def get_user(self, user_id):
         data = self.get_all_users()
         return data[user_id]
-        
+    
+    def get_the_user_id(self):
+        return list(db.keys())[-1]
 
     def get_all_users(self):
         return db
@@ -65,8 +67,7 @@ class UserStore:
         username = data['username']
         email = data['email']
         password = data['password_hash']
-        role = data['role']
-        user = User(name, username, email, password, role)
+        user = User(name, username, email, password)
         db[user_id] = user.toJSON()
 
         response = {

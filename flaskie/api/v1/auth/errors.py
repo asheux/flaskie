@@ -16,7 +16,7 @@ def user_is_valid(data):
 
 def abort_if_doesnt_exists(user_id):
     if user_id not in db:
-        api.abort(404, "User with id {} doesn't exist".format(user_id))
+        api.abort(404, "User with id {} doesn't exist or your provided an id that does not belong to you".format(user_id))
     
 def check_valid_email(email):
     return re.match(r'^.+@([?)[a-zA-Z0-9-.])+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$', email)

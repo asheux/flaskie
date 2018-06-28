@@ -1,6 +1,6 @@
 import unittest
 from flask import current_app
-from app import create_app
+from run import initialize_app
 
 class ConfigTestCase(unittest.TestCase):
     def setUp(self):
