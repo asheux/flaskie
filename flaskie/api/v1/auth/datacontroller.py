@@ -1,7 +1,10 @@
 import re
+from datetime import datetime, timedelta
+import jwt
+from flaskie import settings
 from flask import request, jsonify
-from ..models import User, MainModel
-from flaskie.database import db
+from ..models import User, MainModel, BlackListToken
+from flaskie.database import db, blacklistdb
 from .serializers import Pagination
 from .errors import user_is_valid, check_valid_email
 
@@ -14,7 +17,7 @@ class UserStore:
         name = data['name']
         username = data['username']
         email = data['email']
-        password = data['password_hash']
+        password = data['password']
         errors = user_is_valid(data)
 
         if check_valid_email(email) is None:
@@ -40,7 +43,7 @@ class UserStore:
                 'status': 'success',
                 'message': 'Successfully registered',
                 'your ID': self.get_the_user_id(),
-                'new_user': user.toJSON()
+                'Authorization': generate_token(username)
             }
             return response, 201
 
@@ -57,7 +60,7 @@ class UserStore:
 
     def get_by_field(self, key, value):
         if self.get_all_users() is None:
-            return []
+            return {}
         for item in self.get_all_users().values():
             if item[key] == value:
                 return item
@@ -66,7 +69,7 @@ class UserStore:
         name = data['name']
         username = data['username']
         email = data['email']
-        password = data['password_hash']
+        password = data['password']
         user = User(name, username, email, password)
         db[user_id] = user.toJSON()
 
@@ -78,3 +81,73 @@ class UserStore:
 
     def delete(self, user_id):
         del db[user_id]
+
+    def save_token(self, token):
+        blacklist_token = BlackListToken(token=token)
+        try:
+            # insert the token in database
+            blacklistdb[self.counter] = blacklist_token.toJSON()
+            self.counter += 1
+
+            response = {
+                'status': 'success',
+                'message': 'Successfully logged out.'
+            }
+            return response, 200
+        except Exception as e:
+            response = {
+                'status': 'fail',
+                'message': 'Could not logout'.format(e)
+            }
+            return response, 500
+
+def generate_token(user):
+    g_token = GenerateToken()
+    try:
+        auth_token = g_token.encode_auth_token(user)
+        return auth_token.decode()
+    except Exception as e:
+        response = {
+            'status': 'fail',
+            'message': 'Could not generate token: {}'.format(e)
+        }
+        return response
+
+class GenerateToken:
+    def encode_auth_token(self, username):
+        """
+        Generates the auth token
+        :return string
+        """
+        try:
+            payload = {
+                'exp': datetime.utcnow() + timedelta(days=1, seconds=5),
+                'iat': datetime.utcnow(),
+                'sub': username
+            }
+            return jwt.encode(
+                payload,
+                settings.SECRET_KEY,
+                algorithm='HS256'
+            )
+        except Exception as e:
+            return e
+
+    @staticmethod
+    def decode_auth_token(auth_token):
+        """
+        Decodes the auth token
+        :param auth_token:
+        :return: integer|string
+        """
+        try:
+            payload = jwt.decode(auth_token, settings.SECRET_KEY)
+            is_blacklisted_token = BlackListToken.check_blacklist(auth_token)
+            if is_blacklisted_token:
+                return 'Token blacklisted, please login again.'
+            else:
+                return payload['sub']
+        except jwt.ExpiredSignatureError:
+            return 'Signature expired, please login again'
+        except jwt.InvalidTokenError:
+            return 'Invalid token, please login again'

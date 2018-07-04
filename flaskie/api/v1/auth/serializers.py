@@ -40,7 +40,7 @@ user_register = api.model('Register Model', {
     'name': fields.String(required=True, description='User fullname'),
     'username': fields.String(required=True, description='Username'),
     'email': fields.String(required=True, description='The user\'s email address'),
-    'password_hash': fields.String(required=True, description='The users secret password'),
+    'password': fields.String(required=True, description='The users secret password'),
 })
 
 user_login = api.model('Login Model', {

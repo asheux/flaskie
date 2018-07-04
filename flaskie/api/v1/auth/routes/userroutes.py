@@ -1,5 +1,4 @@
 import logging
-from flask_bcrypt import Bcrypt
 from flask import request, jsonify
 from flask_restplus import Resource
 from ..parsers import pagination_arguments
@@ -8,9 +7,11 @@ from flaskie.api.v1.models import User
 from ..serializers import user_register, page_of_users, Pagination, user_login
 from ..collections import store
 from ..errors import abort_if_doesnt_exists
+from ..authAPI import Auth
+from ..decorators import admin_token_required, token_required
 
-flask_bcrypt = Bcrypt()
 log = logging.getLogger(__name__)
+ns_auth = api.namespace('auth', description='Authentication operations')
 ns = api.namespace('user', description='User operations')
 ns_admin = api.namespace('admin', description='Admin Management')
 
@@ -29,6 +30,8 @@ class UsersCollection(Resource):
 class UserItem(Resource):
     '''Show a single todo item and lets you delete them'''
     @api.response(200, 'success')
+    @token_required
+    @api.doc(security='apikey')
     def get(self, user_id):
         """Returns a user by a given id"""
         abort_if_doesnt_exists(user_id)
@@ -40,7 +43,8 @@ class UserItem(Resource):
 @ns_admin.route('/users')
 class AdminManagementResource(Resource):
     '''Shows a list of all users'''
-    @api.doc('Get a list of users')
+    @api.doc(security='apikey')
+    @admin_token_required
     @api.expect(pagination_arguments)
     def get(self):
         """Return list of users"""
@@ -68,6 +72,8 @@ class AdminManagementResource(Resource):
 class AdminManagementItem(Resource):
     '''Show a single todo item and lets you delete them'''
     @api.response(200, 'success')
+    @api.doc(security='apikey')
+    @admin_token_required
     def get(self, user_id):
         """Returns a user by a given id"""
         abort_if_doesnt_exists(user_id)
@@ -85,6 +91,8 @@ class AdminManagementItem(Resource):
         data = request.json
         return store.update_user(user_id, data)'''
 
+    @api.doc(security='apikey')
+    @admin_token_required
     @api.response(204, 'User deleted')
     def delete(self, user_id):
         """Deletes a user with the given id"""
@@ -96,71 +104,20 @@ class AdminManagementItem(Resource):
         }
         return response, 200
 
-@ns.route('/login')
+@ns_auth.route('/login')
 class UserLoginResource(Resource):
+    @api.doc('login user')
     @api.response(201, 'Login successful')
-    @api.expect(user_login)
+    @api.expect(user_login, validate=True)
     def post(self):
-        try:
-            data = request.json
-            user = store.get_by_field(key='username', value=data.get('username'))
-            if not user:
-                response = {
-                    'status': 'fail',
-                    'message': 'The username you provided does not exist'
-                }
-                return response, 404
-            elif not flask_bcrypt.check_password_hash(user['password_hash'], data.get('password')):
-                response = {
-                    'status': 'fail',
-                    'message': 'The password you provided ({}) did not match the database password'.format(password)
-                }
-                return response, 401
-            else:
-                response = {
-                    'status': 'success',
-                    'message': 'Successfully logged in as {}'.format(user['name'])
-                }
-                return response, 200
+        data = request.json
+        return Auth.login_user(data=data)
 
-        except Exception as e:
-            response = {
-                'status': 'fail',
-                'message': 'Could not login: {}, try again.'.format(e)
-            }
-            return response, 500
-
-
-@ns_admin.route('/login')
-class UserLoginResource(Resource):
-    @api.response(201, 'Login successful')
-    @api.expect(user_login)
+@ns_auth.route('/logout')
+class UserLogoutResource(Resource):
+    @api.doc(security='apikey')
+    @api.response(201, 'Logout successful')
     def post(self):
-        try:
-            data = request.json
-            user = store.get_by_field(key='username', value=data.get('username'))
-            if not user:
-                response = {
-                    'status': 'fail',
-                    'message': 'The username you provided does not exist'
-                }
-                return response, 404
-            elif not flask_bcrypt.check_password_hash(user['password_hash'], data.get('password')):
-                response = {
-                    'status': 'fail',
-                    'message': 'The password you provided ({}) did not match the database password'.format(password)
-                }
-                return response, 401
-            else:
-                response = {
-                    'status': 'success',
-                    'message': 'Successfully logged in as {}'.format(user['name'])
-                }
-                return response, 200
-
-        except Exception as e:
-            response = {
-                'status': 'fail',
-                'message': 'Could not login: {}, try again.'.format(e)
-            }
-            return response, 500
+        # get auth token
+        auth_header = request.headers.get('Authorization')
+        return Auth.logout_user(data=auth_header)

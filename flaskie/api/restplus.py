@@ -4,9 +4,16 @@ from flask import Blueprint
 from flask_restplus import Api
 from .. import settings
 
+authorizations = {
+    'apikey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
 log = logging.getLogger(__name__)
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
-api = Api(version='1.0', title='User API',
+api = Api(authorizations=authorizations, version='1.0', title='User API',
           description='A user api that handles user authentication storing data in memory structure')
         
 
