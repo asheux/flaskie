@@ -5,6 +5,13 @@ from flaskie.database import blacklistdb
 
 flask_bcrypt = Bcrypt()
 
+def get_by_field(key, value):
+    if blacklistdb is None:
+        return {}
+    for item in blacklistdb.values():
+        if item[key] == value:
+            return item
+
 class MainModel:
     def toJSON(self):
         return json.loads(json.dumps(self, default=lambda o: o.strftime("%Y-%m-%d %H:%M:%S") if isinstance(o, datetime)
@@ -32,25 +39,15 @@ class Admin(User):
 
 
 class BlackListToken(MainModel):
-    def __init__(self, token, blacklisted_on=datetime.now().isoformat()):
-        self.token = token
+    def __init__(self, jti, blacklisted_on=datetime.now().isoformat()):
+        self.jti = jti
         self.blacklisted_on = blacklisted_on
 
     def __repr__(self):
-        return '<BlackListToken: {}'.format(self.token)
+        return '<BlackListToken: {}'.format(self.jti)
 
-    def get_by_field(self, key, value):
-        if blacklistdb is None:
-            return {}
-        for item in self.get_all_users().values():
-            if item[key] == value:
-                return item
-
-    @staticmethod
-    def check_blacklist(auth_token):
+    @classmethod
+    def check_blacklist(cls, auth_token):
         """Check if the token is blacklisted"""
-        res = self.get_by_field(key='token', value=str(auth_token))
-        if res:
-            return True
-        else:
-            return False
+        res = get_by_field(key='jti', value=auth_token)
+        return bool(res)

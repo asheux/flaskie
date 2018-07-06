@@ -1,4 +1,3 @@
-from .datacontroller import UserStore, GenerateToken
+from .datacontroller import UserStore
 
 store = UserStore()
-g_token = GenerateToken()

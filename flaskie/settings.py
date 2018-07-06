@@ -14,3 +14,8 @@ RESTPLUS_ERROR_404_HELP = False
 RESTPLUS_MASK_HEADER = 'Authorization'
 
 # SQLAlchemy settings
+
+# Jwt settings
+JWT_BLACKLIST_ENABLED = True
+JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+JWT_SECRET_KEY = 'jwt-secret-string'

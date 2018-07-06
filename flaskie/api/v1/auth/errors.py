@@ -20,3 +20,10 @@ def abort_if_doesnt_exists(user_id):
     
 def check_valid_email(email):
     return re.match(r'^.+@([?)[a-zA-Z0-9-.])+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$', email)
+
+def not_logged_in(user):
+    response_obj = {
+        'status': 'fail',
+        'message': 'No current user, Please log in first'
+    }
+    return response_obj

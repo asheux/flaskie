@@ -37,15 +37,15 @@ class Pagination(object):
 
 
 user_register = api.model('Register Model', {
-    'name': fields.String(required=True, description='User fullname'),
-    'username': fields.String(required=True, description='Username'),
-    'email': fields.String(required=True, description='The user\'s email address'),
-    'password': fields.String(required=True, description='The users secret password'),
+    'name': fields.String(required=True, default='Brian Mboya', description='User fullname'),
+    'username': fields.String(required=True, default='asheuh', description='Username'),
+    'email': fields.String(required=True, default='asheuh@gmail.com', description='The user\'s email address'),
+    'password': fields.String(required=True, default='mermaid', description='The users secret password'),
 })
 
 user_login = api.model('Login Model', {
-    'username': fields.String(required=True, description='Your username'),
-    'password': fields.String(required=True, description='Your password'),
+    'username': fields.String(required=True, default='asheuh', description='Your username'),
+    'password': fields.String(required=True, default='mermaid', description='Your password'),
 })
 
 pagination = api.model('A page of results', {

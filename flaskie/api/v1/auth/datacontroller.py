@@ -1,6 +1,14 @@
 import re
 from datetime import datetime, timedelta
-import jwt
+from flask_jwt_extended import (
+    create_access_token, 
+    create_refresh_token, 
+    jwt_required, 
+    jwt_refresh_token_required, 
+    get_jwt_identity,
+    get_raw_jwt
+)
+import pprint
 from flaskie import settings
 from flask import request, jsonify
 from ..models import User, MainModel, BlackListToken
@@ -38,12 +46,16 @@ class UserStore:
             you_id = username + '00%d' % self.counter
             db[you_id] = user.toJSON()
             self.counter += 1
-
+            access_token = create_access_token(username)
+            refresh_token = create_refresh_token(username)
             response = {
                 'status': 'success',
                 'message': 'Successfully registered',
                 'your ID': self.get_the_user_id(),
-                'Authorization': generate_token(username)
+                'Authorization': {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }
             }
             return response, 201
 
@@ -83,71 +95,15 @@ class UserStore:
         del db[user_id]
 
     def save_token(self, token):
-        blacklist_token = BlackListToken(token=token)
+        blacklist_token = BlackListToken(jti=token)
         try:
             # insert the token in database
             blacklistdb[self.counter] = blacklist_token.toJSON()
+            pprint.pprint(blacklistdb)
             self.counter += 1
-
-            response = {
-                'status': 'success',
-                'message': 'Successfully logged out.'
-            }
-            return response, 200
         except Exception as e:
             response = {
                 'status': 'fail',
-                'message': 'Could not logout'.format(e)
+                'message': 'Could not save'.format(e)
             }
             return response, 500
-
-def generate_token(user):
-    g_token = GenerateToken()
-    try:
-        auth_token = g_token.encode_auth_token(user)
-        return auth_token.decode()
-    except Exception as e:
-        response = {
-            'status': 'fail',
-            'message': 'Could not generate token: {}'.format(e)
-        }
-        return response
-
-class GenerateToken:
-    def encode_auth_token(self, username):
-        """
-        Generates the auth token
-        :return string
-        """
-        try:
-            payload = {
-                'exp': datetime.utcnow() + timedelta(days=1, seconds=5),
-                'iat': datetime.utcnow(),
-                'sub': username
-            }
-            return jwt.encode(
-                payload,
-                settings.SECRET_KEY,
-                algorithm='HS256'
-            )
-        except Exception as e:
-            return e
-
-    @staticmethod
-    def decode_auth_token(auth_token):
-        """
-        Decodes the auth token
-        :param auth_token:
-        :return: integer|string
-        """
-        try:
-            payload = jwt.decode(auth_token, settings.SECRET_KEY)
-            is_blacklisted_token = BlackListToken.check_blacklist(auth_token)
-            if is_blacklisted_token:
-                return 'Token blacklisted, please login again.'
-            else:
-                return payload['sub']
-        except jwt.ExpiredSignatureError:
-            return 'Signature expired, please login again'
-        except jwt.InvalidTokenError:
-            return 'Invalid token, please login again'
