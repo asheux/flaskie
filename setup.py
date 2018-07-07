@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='flaskie',
     version='1.0',
-    description='User RESTful API based on Flask-RESTPlus',
+    description='User REST API based on Flask-RESTPlus',
     url='https://github.com/asheuh/flaskie',
     author='Brian Mboya',
 

@@ -1,30 +1,22 @@
 from functools import wraps
 from flask import request, json
+from flask_jwt_extended import get_jwt_identity
 from .authAPI import Auth
+from .collections import store
 
-def admin_token_required(f):
+def admin_auth(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        try:
-            data, status = Auth.get_logged_in_user(request)
-            token = data.get('data')
-            if not token:
-                return data, status
-
-            admin = token.get('admin')
-            if not admin:
-                response_obj = {
-                    'status': 'fail',
-                    'message': 'Admin is the only one required to view this'
-                }
-                return response_obj, 401
-
-            return f(*args, **kwargs)
-        except Exception as e:
-            response = {
+        data, status = Auth.get_logged_in_user(get_jwt_identity())
+        user = data.get('data')
+        if not user:
+            return data, status
+        if not user['admin'] == store.is_admin():
+            response_obj = {
                 'status': 'fail',
-                'message': 'error: {}'.format(e)
+                'message': 'Sorry, only an admin can perform this action'
             }
-            return response
-
+            return response_obj, 401
+        return f(*args, **kwargs)
     return decorated
+    

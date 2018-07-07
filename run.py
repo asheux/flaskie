@@ -1,11 +1,17 @@
 import logging.config
 import os
+import sys
+from getpass import getpass
 from flask import Flask, Blueprint
+from flask_script import Manager
 from flask_jwt_extended import JWTManager
 from flaskie import settings
+from flaskie.api.v1.auth.errors import check_valid_email
 from flaskie.api.restplus import api
+from flaskie.api.v1.auth.collections import store
 from flaskie.api.restplus import blueprint
-from flaskie.api.v1.models import BlackListToken
+from flaskie.api.v1.models import BlackListToken, User
+from flaskie.database import db
 from flaskie.api.v1.auth.routes.userroutes import ns as user_namespace
 
 app = Flask(__name__)
@@ -26,7 +32,6 @@ def configure_app(flask_app):
 def initialize_app(flask_app):
     configure_app(flask_app)
     jwt = JWTManager(flask_app)
-    
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
         jti = decrypted_token['jti']
@@ -36,11 +41,11 @@ def initialize_app(flask_app):
     api.add_namespace(user_namespace)
     flask_app.register_blueprint(blueprint)
 
-
 def main():
     initialize_app(app)
+
     log.info('Starting development server at http://{}/api/v1/'.format(app.config['SERVER_NAME']))
-    app.run(debug=settings.FLASK_APP)
+    app.run(debug=settings.FLASK_DEBUG)
 
 if __name__ == "__main__":
     main()

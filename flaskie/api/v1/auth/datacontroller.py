@@ -76,6 +76,13 @@ class UserStore:
         for item in self.get_all_users().values():
             if item[key] == value:
                 return item
+    
+    def is_admin(self):
+        """
+        To check if the user is an administrator
+        :return:
+        """
+        return True
                 
     def update_user(self, user_id, data):
         name = data['name']

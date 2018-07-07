@@ -15,7 +15,7 @@ from ..serializers import user_register, page_of_users, Pagination, user_login
 from ..collections import store
 from ..errors import abort_if_doesnt_exists
 from ..authAPI import Auth
-from ..decorators import admin_token_required
+from ..decorators import admin_auth
 
 log = logging.getLogger(__name__)
 ns_auth = api.namespace('auth', description='Authentication operations')
@@ -48,7 +48,8 @@ class UserItem(Resource):
 class AdminManagementResource(Resource):
     '''Shows a list of all users'''
     @api.doc('get list of users')
-    @admin_token_required
+    @jwt_required
+    @admin_auth
     @api.expect(pagination_arguments)
     def get(self):
         """Return list of users"""
@@ -77,7 +78,8 @@ class AdminManagementItem(Resource):
     '''Show a single todo item and lets you delete them'''
     @api.response(200, 'success')
     @api.doc('get user by id')
-    @admin_token_required
+    @jwt_required
+    @admin_auth
     def get(self, user_id):
         """Returns a user by a given id"""
         abort_if_doesnt_exists(user_id)
@@ -86,17 +88,20 @@ class AdminManagementItem(Resource):
         }
         return response, 200
 
-    '''@api.doc(pagination_arguments)
+    @api.doc(pagination_arguments)
+    @jwt_required
+    @admin_auth
     @api.response(200, 'User updated successfully')
-    @api.expect(user, validate=True)
+    @api.expect(user_register, validate=True)
     def put(self, user_id):
         """Updates user details"""
         abort_if_doesnt_exists(user_id)
         data = request.json
-        return store.update_user(user_id, data)'''
+        return store.update_user(user_id, data)
 
     @api.doc('delete user')
-    @admin_token_required
+    @jwt_required
+    @admin_auth
     @api.response(204, 'User deleted')
     def delete(self, user_id):
         """Deletes a user with the given id"""

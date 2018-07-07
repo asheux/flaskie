@@ -34,10 +34,6 @@ class User(MainModel):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Admin(User):
-    pass
-
-
 class BlackListToken(MainModel):
     def __init__(self, jti, blacklisted_on=datetime.now().isoformat()):
         self.jti = jti

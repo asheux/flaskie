@@ -2,7 +2,6 @@ import os
 
 # Flask settings
 FLASK_SERVER_NAME = 'localhost:5000'
-FLASK_APP = 'run.py'
 FLASK_DEBUG = True  # Do not use debug mode in production
 SECRET_KEY = os.getenv('SECRET_KEY', 'i love hot ladies')
 
