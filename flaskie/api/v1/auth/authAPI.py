@@ -28,7 +28,7 @@ class Auth:
             elif not flask_bcrypt.check_password_hash(user['password_hash'], data.get('password')):
                 response = {
                     'status': 'fail',
-                    'message': 'The password you provided ({}) did not match the database password'.format(password)
+                    'message': 'The password you provided ({}) did not match the database password'.format(data.get('password'))
                 }
                 return response, 401
             else:
@@ -42,7 +42,7 @@ class Auth:
                         'refresh_token': refresh_token
                     }
                 }
-                return response, 200
+                return response, 201
 
         except Exception as e:
             response = {

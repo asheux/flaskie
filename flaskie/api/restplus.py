@@ -13,7 +13,7 @@ authorizations = {
 }
 log = logging.getLogger(__name__)
 blueprint = Blueprint('api', __name__, url_prefix='/api/v1')
-api = Api(authorizations=authorizations, version='1.0', title='User API',
+api = Api(blueprint, authorizations=authorizations, version='1.0', title='User API',
           description='A user api that handles user authentication storing data in memory structure')
         
 

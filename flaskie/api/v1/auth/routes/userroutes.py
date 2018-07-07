@@ -44,7 +44,7 @@ class UserItem(Resource):
         current_user = get_jwt_identity()
         return Auth.get_logged_in_user(current_user)
 
-@ns_admin.route('/users')
+@ns_admin.route('/users', endpoint='all_users')
 class AdminManagementResource(Resource):
     '''Shows a list of all users'''
     @api.doc('get list of users')
@@ -73,7 +73,7 @@ class AdminManagementResource(Resource):
             }
             return response, 200
 
-@ns_admin.route('/users/<string:user_id>')
+@ns_admin.route('/users/<string:user_id>', endpoint='user')
 class AdminManagementItem(Resource):
     '''Show a single todo item and lets you delete them'''
     @api.response(200, 'success')
@@ -125,7 +125,7 @@ class UserLoginResource(Resource):
         return Auth.login_user(data=data)
 
 @ns_auth.route('/refresh_token')
-class  TokenRefresh(Resource):
+class TokenRefresh(Resource):
     """Token refresh resource"""
     @jwt_refresh_token_required
     @api.doc('token refresh')

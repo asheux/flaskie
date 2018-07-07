@@ -1,11 +1,13 @@
 import unittest
+from flask import Flask
 from flask import current_app
-from run import initialize_app
+from run import create_app
+from flaskie import settings
 
 class ConfigTestCase(unittest.TestCase):
     def setUp(self):
         """Creates an environment for the test that is close to the app running"""
-        self.app = create_app('testing')
+        self.app = create_app(settings.TESTING)
         self.app_context = self.app.app_context()
         self.app_context.push()
 
@@ -17,4 +19,4 @@ class ConfigTestCase(unittest.TestCase):
         self.assertFalse(current_app is None)
 
     def test_app_is_testing(self):
-        self.assertTrue(current_app.config['TESTING'])
+        self.assertTrue(current_app.config)

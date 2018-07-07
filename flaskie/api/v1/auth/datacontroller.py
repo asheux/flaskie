@@ -40,7 +40,7 @@ class UserStore:
                 'status': 'error',
                 'message': errors
             }
-            return response
+            return response, 401
         else:
             user = User(name, username, email, password)
             you_id = username + '00%d' % self.counter
