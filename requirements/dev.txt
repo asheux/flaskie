@@ -15,7 +15,6 @@ Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.3
 Flask-JWT-Extended==3.10.0
 Flask-Migrate==2.1.1
-Flask-RESTful==0.3.6
 flask-restplus==0.10.1
 Flask-Script==2.0.6
 Flask-SocketIO==2.9.3
@@ -35,7 +34,6 @@ MarkupSafe==1.0
 mccabe==0.6.1
 more-itertools==4.2.0
 pluggy==0.6.0
-psycopg2==2.7.3.2
 py==1.5.4
 pycparser==2.18
 PyJWT==1.5.3
