@@ -45,7 +45,7 @@ python-dotenv==0.8.2
 python-editor==1.0.3
 python-engineio==2.0.2
 python-socketio==1.8.4
-pytz==2017.3
+pytz==2018.3
 selenium==3.8.1
 six==1.11.0
 SQLAlchemy==1.2.0
