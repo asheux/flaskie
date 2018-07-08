@@ -8,10 +8,13 @@ python:
   - "nightly"
   - "pypy"
 
+matrix:
+  allow_failures:
+    - python: "nightly"
+    - python: "pypy"
+
 install:
   - pip install -r requirements/dev.txt
 
 script:
   - python3 -m pytest
-
-  

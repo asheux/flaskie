@@ -6,7 +6,6 @@ attrs==18.1.0
 autoenv==1.0.0
 bcrypt==3.1.4
 cffi==1.11.2
-click==6.7
 coverage==4.4.2
 enum-compat==0.0.2
 eventlet==0.21.0
@@ -15,13 +14,12 @@ Flask-Bcrypt==0.7.1
 Flask-Cors==3.0.3
 Flask-JWT-Extended==3.10.0
 Flask-Migrate==2.1.1
-Flask-RESTful==0.3.6
 flask-restplus==0.10.1
 Flask-Script==2.0.6
 Flask-SocketIO==2.9.3
 Flask-SQLAlchemy==2.3.2
 Flask-Testing==0.7.1
--e git+https://github.com/asheuh/flaskie.git@2e8d6eef90116e6b2bc13e58faeba23ec972b2c7#egg=flaskie
+-e git+https://github.com/asheuh/flaskie.git@7480070a4bbc4a734add6a535760f3281569f389#egg=flaskie
 gem==0.1.12
 greenlet==0.4.12
 gunicorn==19.7.1
@@ -45,7 +43,7 @@ python-dotenv==0.8.2
 python-editor==1.0.3
 python-engineio==2.0.2
 python-socketio==1.8.4
-pytz==2017.3
+pytz==2018.3
 selenium==3.8.1
 six==1.11.0
 SQLAlchemy==1.2.0
