@@ -2,6 +2,8 @@
 
 ![Travis](https://img.shields.io/travis/asheuh/flaskie.svg)
 
+.. image:: https://coveralls.io/repos/asheuh/flaskie/badge.png?branch=develop
+    :target: https://coveralls.io/r/asheuh/flaskie
 
 #### Overview
 
