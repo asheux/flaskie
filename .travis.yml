@@ -7,6 +7,10 @@ python:
 
 install:
   - pip install -r requirements/dev.txt
+  - python setup.py develop
 
 script:
-  - python3 -m pytest
+  - py.test --cov=flaskie tests/
+
+after_success:
+  - coveralls
