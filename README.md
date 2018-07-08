@@ -13,7 +13,7 @@ A simple flask api to handle user authentication based on Flask and flask-RESTPl
 - Users can delete thier account
 - Users can view the account details
 
-![Flaskie Endpoints overview](https://raw.githubusercontent.com/asheuh/flaskie/develop/api.png)
+![Flaskie Endpoints overview](https://user-images.githubusercontent.com/22955146/42416014-1837d00c-826c-11e8-86e7-03ef24ea80fa.png)
 
 
 # Installation and Setup
