@@ -1,17 +1,9 @@
 language: python
 python:
-  - "2.7"
   - "3.3"
   - "3.4"
   - "3.5"
   - "3.6"
-  - "nightly"
-  - "pypy"
-
-matrix:
-  allow_failures:
-    - python: "nightly"
-    - python: "pypy"
 
 install:
   - pip install -r requirements/dev.txt
