@@ -17,11 +17,14 @@ from .serializers import Pagination
 from .errors import user_is_valid, check_valid_email
 
 class UserStore:
+    """The class controls the adding and fetching a user in the database"""
     
     def __init__(self):
+        """Initializes the counter id"""
         self.counter = 1
     
     def create_user(self, data):
+        """Creates a new user and adds the user in the database"""
         name = data['name']
         username = data['username']
         email = data['email']
@@ -61,16 +64,20 @@ class UserStore:
 
 
     def get_user(self, user_id):
+        """Gets a single user in the database by a given id"""
         data = self.get_all_users()
         return data[user_id]
     
     def get_the_user_id(self):
+        """Gets the last added user's id from the database"""
         return list(db.keys())[-1]
 
     def get_all_users(self):
+        """Gets all the available users from the database"""
         return db
 
     def get_by_field(self, key, value):
+        """Gets a user by a given field"""
         if self.get_all_users() is None:
             return {}
         for item in self.get_all_users().values():
@@ -85,6 +92,7 @@ class UserStore:
         return True
                 
     def update_user(self, user_id, data):
+        """Updates or modifies a given user by id"""
         name = data['name']
         username = data['username']
         email = data['email']
@@ -99,9 +107,11 @@ class UserStore:
         return response, 200
 
     def delete(self, user_id):
+        """Deletes a user from the database"""
         del db[user_id]
 
     def save_token(self, token):
+        """Saves the blacklisted token in the database"""
         blacklist_token = BlackListToken(jti=token)
         try:
             # insert the token in database

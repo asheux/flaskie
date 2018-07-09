@@ -5,6 +5,7 @@ from .authAPI import Auth
 from .collections import store
 
 def admin_auth(f):
+    """Creates the admin guard decorator"""
     @wraps(f)
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(get_jwt_identity())

@@ -24,6 +24,7 @@ ns_admin = api.namespace('admin', description='Admin Management')
 
 @ns_auth.route('/register')
 class UsersCollection(Resource):
+    """This class creates a new user in the database"""
     @api.doc(pagination_arguments)
     @api.response(201, 'User created successfully')
     @api.expect(user_register, validate=True)
@@ -35,7 +36,7 @@ class UsersCollection(Resource):
 @ns.route('')
 @api.response(404, 'User with the given id not found')
 class UserItem(Resource):
-    '''Show a single todo item and lets you delete them'''
+    """Show a single todo item and lets you delete them"""
     @api.response(200, 'success')
     @jwt_required
     @api.doc('user gets their details')
@@ -43,10 +44,21 @@ class UserItem(Resource):
         """Returns a logged in user's details"""
         current_user = get_jwt_identity()
         return Auth.get_logged_in_user(current_user)
+    
+
+    @api.doc(pagination_arguments)
+    @jwt_required
+    @api.response(200, 'User updated successfully')
+    @api.expect(user_register, validate=True)
+    def put(self, user_id):
+        """Updates user details"""
+        abort_if_doesnt_exists(user_id)
+        data = request.json
+        return store.update_user(user_id, data)
 
 @ns_admin.route('/users', endpoint='all_users')
 class AdminManagementResource(Resource):
-    '''Shows a list of all users'''
+    """Shows a list of all users"""
     @api.doc('get list of users')
     @jwt_required
     @admin_auth
@@ -75,7 +87,7 @@ class AdminManagementResource(Resource):
 
 @ns_admin.route('/users/<string:user_id>', endpoint='user')
 class AdminManagementItem(Resource):
-    '''Show a single todo item and lets you delete them'''
+    """Show a single todo item and lets you delete them"""
     @api.response(200, 'success')
     @api.doc('get user by id')
     @jwt_required
@@ -87,17 +99,6 @@ class AdminManagementItem(Resource):
             "data": store.get_user(user_id)
         }
         return response, 200
-
-    @api.doc(pagination_arguments)
-    @jwt_required
-    @admin_auth
-    @api.response(200, 'User updated successfully')
-    @api.expect(user_register, validate=True)
-    def put(self, user_id):
-        """Updates user details"""
-        abort_if_doesnt_exists(user_id)
-        data = request.json
-        return store.update_user(user_id, data)
 
     @api.doc('delete user')
     @jwt_required

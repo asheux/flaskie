@@ -15,13 +15,16 @@ def user_is_valid(data):
     return errors
 
 def abort_if_doesnt_exists(user_id):
+    """Checks if given id exists in the database"""
     if user_id not in db:
         api.abort(404, "User with id {} doesn't exist or your provided an id that does not belong to you".format(user_id))
     
 def check_valid_email(email):
+    """Checks if the email provided is valid"""
     return re.match(r'^.+@([?)[a-zA-Z0-9-.])+.([a-zA-Z]{2,3}|[0-9]{1,3})(]?)$', email)
 
 def not_logged_in(user):
+    """Checks if user is logged in or not"""
     response_obj = {
         'status': 'fail',
         'message': 'No current user, Please log in first'

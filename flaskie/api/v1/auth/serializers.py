@@ -4,7 +4,7 @@ from flaskie.api.restplus import api
 
 
 class Pagination(object):
-
+    """Creates pagination"""
     def __init__(self, page, per_page, total_count):
         self.page = page
         self.per_page = per_page
@@ -34,7 +34,6 @@ class Pagination(object):
                     yield None
                 yield num
                 last = num
-
 
 user_register = api.model('Register Model', {
     'name': fields.String(required=True, default='Brian Mboya', description='User fullname'),
