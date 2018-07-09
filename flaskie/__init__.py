@@ -17,7 +17,6 @@ logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
 def configure_app(flask_app):
-    flask_app.config['SERVER_NAME'] = settings.FLASK_SERVER_NAME
     flask_app.config['SWAGGER_UI_DOC_EXPANSION'] = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
@@ -36,7 +35,6 @@ def initialize_app(flask_app):
         jti = decrypted_token['jti']
         return BlackListToken.check_blacklist(jti)
 
-    api.add_namespace(user_namespace)
     flask_app.register_blueprint(blueprint)
 
 def create_app(config_name):
@@ -44,6 +42,6 @@ def create_app(config_name):
     app.config.from_object(config_name)
     initialize_app(app)
 
-    log.info('Starting development server at http://{}/api/v1/'.format(app.config['SERVER_NAME']))
+    log.info('Starting development server at http://{}/api/v1/'.format(settings.FLASK_SERVER_NAME))
 
     return app
