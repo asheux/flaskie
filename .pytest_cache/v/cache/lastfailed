@@ -1,0 +1,4 @@
+{
+  "tests/test_user_auth_blueprint.py::BaseTestCase": true,
+  "tests/test_user_auth_blueprint.py::TestAuthBlueprint": true
+}
