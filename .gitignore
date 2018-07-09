@@ -7,3 +7,4 @@ venv
 .env
 .env-mysql
 .vscode
+.pytest_cache/

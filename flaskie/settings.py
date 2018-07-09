@@ -1,7 +1,7 @@
 import os
 
 # Flask settings
-FLASK_SERVER_NAME = '127.0.0.1:8000'
+FLASK_SERVER_NAME = '127.0.0.1:5000'
 FLASK_DEBUG = True  # Do not use debug mode in production
 SECRET_KEY = os.getenv('SECRET_KEY', 'i love hot ladies')
 TESTING = True

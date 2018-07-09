@@ -1,5 +1,5 @@
 from unittest import TestCase
-from run import create_app
+from flaskie import create_app
 from flaskie import settings
 
 class BaseTestCase(TestCase):

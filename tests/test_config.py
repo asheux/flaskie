@@ -1,7 +1,7 @@
 import unittest
 from flask import Flask
 from flask import current_app
-from run import create_app
+from flaskie import create_app
 from flaskie import settings
 
 class ConfigTestCase(unittest.TestCase):
