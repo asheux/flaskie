@@ -34,7 +34,7 @@ api = Api(blueprint, authorizations=authorizations, version='1.0', title='User A
             "Click the authorize button and add the token in the following format.\n\n"
             "`Bearer (jwt-token without the brackets)`\n\n"
             "There is also a built-in user:\n"
-            "* `asheuh` (administrator with all permissions) with password `mermaid`\n\n"
+            "* `paulla` (administrator with all permissions) with password `mermaid`\n\n"
             "## Authorization token(with the help of)\n"
             "`Jwt-Extended`"
         ),
