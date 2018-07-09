@@ -44,9 +44,8 @@ class UserItem(Resource):
         """Returns a logged in user's details"""
         current_user = get_jwt_identity()
         return Auth.get_logged_in_user(current_user)
+    
 
-@ns.route('/<string:user_id>')    
-class ModifyUser(Resource):
     @api.doc(pagination_arguments)
     @jwt_required
     @api.response(200, 'User updated successfully')
