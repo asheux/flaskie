@@ -14,8 +14,10 @@ from .errors import not_logged_in
 flask_bcrypt = Bcrypt()
 
 class Auth:
+    """The class handles all authentications"""
     @staticmethod
     def login_user(data):
+        """Login authentication"""
         try:
             data = request.json
             user = store.get_by_field(key='username', value=data.get('username'))
@@ -53,11 +55,13 @@ class Auth:
 
     @staticmethod
     def logout_user(data):
+        """Logout authentication"""
         return store.save_token(data)
 
 
     @staticmethod
     def get_logged_in_user(identity):
+        """Get the currently logged in user"""
         # get the auth token
         user = store.get_by_field(key='username', value=identity)
         if user is not None:

@@ -1,7 +1,7 @@
 Metadata-Version: 1.1
 Name: flaskie
 Version: 1.0
-Summary: User RESTful API based on Flask-RESTPlus
+Summary: User REST API based on Flask-RESTPlus
 Home-page: https://github.com/asheuh/flaskie
 Author: Brian Mboya
 Author-email: UNKNOWN

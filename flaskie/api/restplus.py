@@ -19,6 +19,7 @@ api = Api(blueprint, authorizations=authorizations, version='1.0', title='User A
 
 @api.errorhandler
 def default_error_handler(e):
+    """Handles errors on the app at runtime"""
     message = 'An unhandled exception occurred.'
     log.exception(message)
 
