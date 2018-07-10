@@ -20,7 +20,7 @@ A simple flask api to handle user authentication based on Flask and flask-RESTPl
 - Role based permission system
 - It is auto documented
 
-##Exploring the demo.\n"
+##Exploring the demo."
 
 Create a new user at the 'POST /auth/user' endpoint. Get the user access token from the response.
 Click the authorize button and add the token in the following format.
@@ -68,7 +68,7 @@ venv\Scripts\activate
 ## Install requirements( with pip)
 
 ```
-$ pip install -r requirements/dev.txt
+$ pip install -r requirements.txt
 ```
 
 ## Running the application
@@ -82,13 +82,13 @@ $ python setup.py develop
 
 Run the application
 ```
-$ python run.py
+$ python app.py
 ```
 
 ## Url for endpoints
 
 ```
-http://localhost:5000/api/v1/
+http://127.0.0.1:5000/api/v1/
 
 ```
 ## The app is deploy to heroku with the following url
