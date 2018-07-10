@@ -1,6 +1,6 @@
 # flaskie
 
-![Travis](https://img.shields.io/travis/asheuh/flaskie.svg) [![Coverage Status](https://coveralls.io/repos/github/asheuh/flaskie/badge.svg?branch=develop)](https://coveralls.io/github/asheuh/flaskie?branch=develop) [![Heroku](http://heroku-badge.herokuapp.com/?app=flaskie&root=api/v1/&style=flat&svg=1)](https://bashtech-heroku.herokuapp.com/api/v1/)
+![Travis](https://img.shields.io/travis/asheuh/flaskie.svg) [![Coverage Status](https://coveralls.io/repos/github/asheuh/flaskie/badge.svg?branch=develop)](https://coveralls.io/github/asheuh/flaskie?branch=develop) [![Heroku](http://heroku-badge.herokuapp.com/?app=flaskie&style=flat)](https://bashtech-heroku.herokuapp.com/api/v1/)
 
 #### Overview
 
