@@ -1,6 +1,6 @@
 # flaskie
 
-![Travis](https://img.shields.io/travis/asheuh/flaskie.svg) [![Coverage Status](https://coveralls.io/repos/github/asheuh/flaskie/badge.svg?branch=develop)](https://coveralls.io/github/asheuh/flaskie?branch=develop)
+![Travis](https://img.shields.io/travis/asheuh/flaskie.svg) [![Coverage Status](https://coveralls.io/repos/github/asheuh/flaskie/badge.svg?branch=develop)](https://coveralls.io/github/asheuh/flaskie?branch=develop) [![Heroku](http://heroku-badge.herokuapp.com/?app=flaskie&root=api/v1/&style=flat&svg=1)](https://bashtech-heroku.herokuapp.com/api/v1/)
 
 #### Overview
 
@@ -12,6 +12,27 @@ A simple flask api to handle user authentication based on Flask and flask-RESTPl
 - Users can update thier details
 - Users can delete thier account
 - Users can view the account details
+- Admin can view all users in the app
+- Admin can view his/her details
+- Admin can delete a user with the specified user_id
+- Admin can get a user with the specified user_id
+- Admin can update a user with the specified user_id
+- Role based permission system
+- It is auto documented
+
+##Exploring the demo.\n"
+
+Create a new user at the 'POST /auth/user' endpoint. Get the user access token from the response.
+Click the authorize button and add the token in the following format.
+
+`Bearer (jwt-token without the brackets)`
+
+There is also a built-in user:
+
+`paulla` (administrator with all permissions) with password `mermaid`
+
+## Authorization token(with the help of)\n"
+`Jwt-Extended`"
 
 ![Flaskie Endpoints overview](https://user-images.githubusercontent.com/22955146/42416014-1837d00c-826c-11e8-86e7-03ef24ea80fa.png)
 
@@ -70,3 +91,6 @@ $ python run.py
 http://localhost:5000/api/v1/
 
 ```
+## The app is deploy to heroku with the following url
+
+* [here is the live demo on heroku](https://bashtech-heroku.herokuapp.com/api/v1/)
