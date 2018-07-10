@@ -6,6 +6,10 @@
 
 A simple flask api to handle user authentication based on Flask and flask-RESTPlus
 
+[view on docker](https://hub.docker.com/r/asheuh/flaskie/)
+
+[view on heroku](https://bashtech-heroku.herokuapp.com/api/v1)
+
 #### Required Features
 
 - Users can create an account and log in.
