@@ -1,3 +1,5 @@
+from flask_jwt_extended import get_jwt_identity, jwt_required
+
 db = {
     "paulla000": {
         'admin': True, 
@@ -9,3 +11,10 @@ db = {
     }
 }
 blacklistdb = {}
+requestsdb = {}
+
+
+@jwt_required
+def get_current_user():
+    from flaskie.api.v1.auth.collections import store
+    return store.get_by_field(key='username', value=get_jwt_identity())

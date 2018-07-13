@@ -62,3 +62,21 @@ class BlackListToken(MainModel):
         """Check if the token is blacklisted"""
         res = get_by_field(key='jti', value=auth_token)
         return bool(res)
+
+
+class Requests(MainModel):
+    def __init__(self, 
+        requestname, 
+        description,
+        created_by=None, 
+        date_created=datetime.now(), 
+        date_modified=datetime.now()):
+
+        self.requestname = requestname
+        self.description = description
+        self.created_by = created_by
+        self.date_created = date_created
+        self.date_modified = date_modified
+
+    def __repr__(self):
+        return '<Requests %r>' % self.requestname

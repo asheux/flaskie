@@ -29,7 +29,7 @@ class Pagination(object):
             if num <= left_edge or \
                (num > self.page - left_current - 1 and \
                 num < self.page + right_current) or \
-               num > self.pages - right_edge:
+                num > self.pages - right_edge:
                 if last + 1 != num:
                     yield None
                 yield num
@@ -43,8 +43,13 @@ user_register = api.model('Register Model', {
 })
 
 user_login = api.model('Login Model', {
-    'username': fields.String(required=True, default='asheuh', description='Your username'),
+    'username': fields.String(required=True, default='paulla', description='Your username'),
     'password': fields.String(required=True, default='mermaid', description='Your password'),
+})
+
+requests = api.model('Request Model', {
+    'requestname': fields.String(required=True, default='Internet', description='Request name'),
+    'description': fields.String(required=True, default='Slow internet connection', description='request description')
 })
 
 pagination = api.model('A page of results', {

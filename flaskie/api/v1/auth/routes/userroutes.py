@@ -11,9 +11,15 @@ from flask_jwt_extended import (
 from ..parsers import pagination_arguments
 from flaskie.api.restplus import api
 from flaskie.api.v1.models import User
-from ..serializers import user_register, page_of_users, Pagination, user_login
-from ..collections import store
-from ..errors import abort_if_doesnt_exists
+from ..serializers import (
+    user_register, 
+    page_of_users, 
+    Pagination, 
+    user_login,
+    requests
+)
+from ..collections import store, reqstore
+from ..errors import abort_if_doesnt_exists, abort_if_request_doesnt_exists
 from ..authAPI import Auth
 from ..decorators import admin_auth
 
@@ -34,7 +40,6 @@ class UsersCollection(Resource):
         return store.create_user(data=data)
 
 @ns.route('')
-@api.response(404, 'User with the given id not found')
 class UserItem(Resource):
     """Show a single todo item and lets you delete them"""
     @api.response(200, 'success')
@@ -45,7 +50,8 @@ class UserItem(Resource):
         current_user = get_jwt_identity()
         return Auth.get_logged_in_user(current_user)
 
-@ns.route('/<string:user_id>')    
+@ns.route('/<string:user_id>') 
+@api.response(404, 'User with the given id not found')
 class ModifyUser(Resource):
     @api.doc(pagination_arguments)
     @jwt_required
@@ -87,6 +93,7 @@ class AdminManagementResource(Resource):
             return response, 200
 
 @ns_admin.route('/users/<string:user_id>', endpoint='user')
+@api.response(404, 'User with the given id not found')
 class AdminManagementItem(Resource):
     """Show a single todo item and lets you delete them"""
     @api.response(200, 'success')
@@ -100,20 +107,7 @@ class AdminManagementItem(Resource):
             "data": store.get_user(user_id)
         }
         return response, 200
-
-    @api.doc('delete user')
-    @jwt_required
-    @admin_auth
-    @api.response(204, 'User deleted')
-    def delete(self, user_id):
-        """Deletes a user with the given id"""
-        abort_if_doesnt_exists(user_id)
-        store.delete(user_id)
-        response = {
-            'status': 'success',
-            'message': 'user with id {} deleted successfully'.format(user_id)
-        }
-        return response, 200
+        
 
 @ns_auth.route('/login')
 class UserLoginResource(Resource):
@@ -193,3 +187,127 @@ class UserLogoutResourceRefresh(Resource):
             return {
                 'message': 'could not generate refresh token'
             }
+
+@ns.route('/requests')
+class UserRequestsResource(Resource):
+    """Request resource endpoint"""
+    @jwt_required
+    @api.doc('Request resource')
+    @api.response(201, 'Successfully created')
+    @api.expect(requests)
+    def post(self):
+        """Creates a new request"""
+        data = request.json
+        return reqstore.create_request(data=data)
+    
+    @jwt_required
+    @api.doc('Request resource')
+    @api.response(200, 'success')
+    def get(self):
+        """get all requests for this particular user"""
+        args = pagination_arguments.parse_args(strict=True)
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        data = reqstore.get_all_requests()
+        requests = [req for req in data.values() if req['created_by']['username'] == get_jwt_identity()]
+        paginate = Pagination(page, per_page, len(requests))
+        if requests == []:
+            response = {
+                'message': 'The current user has no request in the db'
+            }
+            return response, 404
+        response = {
+            'status': 'success',
+            "page": paginate.page,
+            "per_page": paginate.per_page,
+            "total": paginate.total_count,
+            'data': requests
+        }
+        return response, 200
+
+@ns.route('/requests/<int:request_id>')
+@api.response(404, 'request with the given id not found')
+class UserRequestItem(Resource):
+    """Single user request resource"""
+    @jwt_required
+    @api.doc('Single request resource')
+    @api.response(200, 'Success')
+    def get(self, request_id):
+        """Get a request by a specific user"""
+        abort_if_request_doesnt_exists(request_id)
+        data = reqstore.get_one_request(request_id)
+        if data['created_by']['username'] == get_jwt_identity():
+            response = {
+                'status': 'success',
+                'data': data
+            }
+            return response, 200
+        else:
+            response = {
+                'status': 'fail',
+                'message': 'You are no allowed to view or update this request'
+            }
+            return response, 401
+
+    @jwt_required
+    @api.doc('Modify request resource')
+    @api.response(200, 'Successfully updated')
+    @api.expect(requests)
+    def put(self, request_id):
+        """Modifies a request with the given id"""
+        abort_if_request_doesnt_exists(request_id)
+        my_request = reqstore.get_one_request(request_id)
+        if my_request['created_by']['username'] != get_jwt_identity():
+            response = {
+                'status': 'fail',
+                'message': 'You are not permitted to view or update this request'
+            }
+
+            return response, 401
+        else:
+            data = request.json
+            my_request['requestname'] = data['requestname']
+            my_request['description'] = data['description']
+            response = {
+                'status': 'success',
+                'message': 'request updated successfully'
+            }
+            return response, 200
+    
+@ns_admin.route('/requests')
+class AdminManageRequests(Resource):
+    @jwt_required
+    @api.doc('Get all requests')
+    @api.response(200, 'success')
+    @admin_auth
+    def get(self):
+        """Get all the request from the db"""
+        args = pagination_arguments.parse_args(strict=True)
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        requests_query = reqstore.get_all_requests()
+        paginate = Pagination(page, per_page, len(requests_query))
+        if requests_query == {}:
+            response = {
+                "message": "There are no requests in the database yet"
+            }
+            return response, 404
+        else:
+            response = {
+                "page": paginate.page,
+                "per_page": paginate.per_page,
+                "total": paginate.total_count,
+                "data": requests_query
+            }
+            return response, 200
+
+@ns_admin.route('/requests/<int:request_id>/<string:action>')
+class AdminReactsToRequest(Resource):
+    """Modify a request by responsing to it"""
+    @jwt_required
+    @api.doc('Modify a given given request for a user')
+    @api.response(200, 'successfully updated')
+    @admin_auth
+    def put(self, request_id):
+        """Modify a request for a user"""
+        pass
