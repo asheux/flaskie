@@ -11,10 +11,11 @@ from flask_jwt_extended import (
 import pprint
 from flaskie import settings
 from flask import request, jsonify
-from ..models import User, MainModel, BlackListToken
-from flaskie.database import db, blacklistdb
+from flaskie.database import get_current_user
+from ..models import User, MainModel, BlackListToken, Requests
+from flaskie.database import db, blacklistdb, requestsdb
 from .serializers import Pagination
-from .errors import user_is_valid, check_valid_email
+from .errors import user_is_valid, check_valid_email, request_is_valid
 
 class UserStore:
     """The class controls the adding and fetching a user in the database"""
@@ -124,3 +125,42 @@ class UserStore:
                 'message': 'Could not save'.format(e)
             }
             return response, 500
+
+class RequestStore:
+    def __init__(self):
+        self.index = 1
+
+    def create_request(self, data):
+        requestname = data['requestname']
+        description = data['description']
+        requests = Requests(requestname, description, created_by=get_current_user())
+        requestsdb[self.index] = requests.toJSON()
+        self.index += 1
+
+        response = {
+            'status': 'success',
+            'message': 'requests created successfully',
+            'data': requests.toJSON()
+        }
+        return response, 201
+
+    def get_all_requests(self):
+        """Gets all requests in the database"""
+        return requestsdb
+
+    def get_by_field(self, key, value):
+        """Gets a request by a given field"""
+        if self.get_all_requests() is None:
+            return {}
+        for item in self.get_all_requests().values():
+            if item[key] == value:
+                return item
+
+    def get_one_request(self, request_id):
+        """Gets a single request by a given request id"""
+        data = self.get_all_requests()
+        return data[request_id]
+    
+    def delete(self, request_id):
+        """Admin deletes a request"""
+        del requestsdb[request_id]
