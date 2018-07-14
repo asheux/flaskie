@@ -85,6 +85,7 @@ class AdminManagementResource(Resource):
             return response, 404
         else:
             response = {
+                'status': 'success',
                 "page": paginate.page,
                 "per_page": paginate.per_page,
                 "total": paginate.total_count,
@@ -104,6 +105,7 @@ class AdminManagementItem(Resource):
         """Returns a user by a given id"""
         abort_if_doesnt_exists(user_id)
         response = {
+            "status": "success",
             "data": store.get_user(user_id)
         }
         return response, 200
@@ -213,6 +215,7 @@ class UserRequestsResource(Resource):
         paginate = Pagination(page, per_page, len(requests))
         if requests == []:
             response = {
+                'status': 'fail',
                 'message': 'The current user has no request in the db'
             }
             return response, 404
@@ -289,11 +292,13 @@ class AdminManageRequests(Resource):
         paginate = Pagination(page, per_page, len(requests_query))
         if requests_query == {}:
             response = {
+                "status": "fail",
                 "message": "There are no requests in the database yet"
             }
             return response, 404
         else:
             response = {
+                "status": "success",
                 "page": paginate.page,
                 "per_page": paginate.per_page,
                 "total": paginate.total_count,

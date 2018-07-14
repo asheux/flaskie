@@ -82,4 +82,4 @@ class Auth:
                 'status': 'fail',
                 'message': 'user is none'
             }
-            return response_obj
+            return response_obj, 404
