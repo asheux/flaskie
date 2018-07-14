@@ -15,7 +15,6 @@ class TestUserLogin(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
-            print(response.data.decode())
             self.assertTrue(response_data['status'] == 'success')
             self.assertTrue(response_data['message'] == 'Successfully logged in as Paulla Mboya')
             self.assertTrue(response_data['Authorization'])
@@ -32,7 +31,6 @@ class TestUserLogin(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
-            print(response.data.decode())
             self.assertTrue(response_data['status'] == 'fail')
             self.assertTrue(response_data['message'] == 'The username you provided does not exist')
             self.assertEqual(response.status_code, 404)
@@ -48,7 +46,6 @@ class TestUserLogin(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response.data.decode())
-            print(response.data.decode())
             self.assertTrue(response_data['status'] == 'fail')
             self.assertTrue(response_data['message'] == 'The password you provided (chessi) did not match the database password')
             self.assertEqual(response.status_code, 401)

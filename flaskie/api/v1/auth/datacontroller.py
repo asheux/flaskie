@@ -102,7 +102,8 @@ class UserStore:
         db[user_id] = user.toJSON()
 
         response = {
-            'status': 'user updated successfully',
+            'status': 'success',
+            'message': 'user updated successfully',
             'data': user.toJSON()
         }
         return response, 200

@@ -1,5 +1,4 @@
 import json
-import pprint
 from .base_test import BaseTestCase
 
 class TestUserStatus(BaseTestCase):
@@ -15,7 +14,6 @@ class TestUserStatus(BaseTestCase):
                 )),
                 content_type='application/json'
             )
-            print(resp_register.data.decode())
             response = self.client.get(
                 '/api/v1/user',
                 headers=dict(
