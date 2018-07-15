@@ -15,6 +15,7 @@ RESTPLUS_ERROR_404_HELP = False
 RESTPLUS_MASK_HEADER = 'Authorization'
 
 # SQLAlchemy settings
+STATUS_P = 'Pending'
 
 # Jwt settings
 JWT_BLACKLIST_ENABLED = True

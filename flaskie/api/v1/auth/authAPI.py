@@ -9,7 +9,6 @@ from flask_jwt_extended import (
     get_raw_jwt
 )
 from .collections import store
-from .errors import not_logged_in
 
 flask_bcrypt = Bcrypt()
 

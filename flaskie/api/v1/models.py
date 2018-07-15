@@ -1,5 +1,6 @@
 from flask_bcrypt import Bcrypt
 from flask import json
+from flaskie import settings
 from datetime import datetime
 from flaskie.database import blacklistdb
 
@@ -66,9 +67,10 @@ class BlackListToken(MainModel):
 
 class Requests(MainModel):
     def __init__(self, 
-        requestname, 
+        requestname,
         description,
-        created_by=None, 
+        created_by=None,
+        status=settings.STATUS_P,
         date_created=datetime.now(), 
         date_modified=datetime.now()):
 
@@ -76,6 +78,7 @@ class Requests(MainModel):
         self.description = description
         self.created_by = created_by
         self.date_created = date_created
+        self.status = status
         self.date_modified = date_modified
 
     def __repr__(self):
