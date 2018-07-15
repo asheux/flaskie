@@ -16,9 +16,11 @@ from ..serializers import (
     page_of_users, 
     Pagination, 
     user_login,
-    requests
+    requests,
+    request_status
 )
 from ..collections import store, reqstore
+from flaskie import settings
 from ..errors import abort_if_doesnt_exists, abort_if_request_doesnt_exists
 from ..authAPI import Auth
 from ..decorators import admin_auth
@@ -237,7 +239,7 @@ class UserRequestItem(Resource):
     @api.response(200, 'Success')
     def get(self, request_id):
         """Get a request by a specific user"""
-        abort_if_request_doesnt_exists(request_id)
+        # abort_if_request_doesnt_exists(request_id)
         data = reqstore.get_one_request(request_id)
         if data['created_by']['username'] == get_jwt_identity():
             response = {
@@ -258,7 +260,7 @@ class UserRequestItem(Resource):
     @api.expect(requests)
     def put(self, request_id):
         """Modifies a request with the given id"""
-        abort_if_request_doesnt_exists(request_id)
+        # abort_if_request_doesnt_exists(request_id)
         my_request = reqstore.get_one_request(request_id)
         if my_request['created_by']['username'] != get_jwt_identity():
             response = {
@@ -306,13 +308,28 @@ class AdminManageRequests(Resource):
             }
             return response, 200
 
-@ns_admin.route('/requests/<int:request_id>/<string:action>')
+@ns_admin.route('/requests/<int:request_id>')
 class AdminReactsToRequest(Resource):
     """Modify a request by responsing to it"""
     @jwt_required
     @api.doc('Modify a given given request for a user')
     @api.response(200, 'successfully updated')
+    @api.expect(request_status)
     @admin_auth
     def put(self, request_id):
         """Modify a request for a user"""
-        pass
+        abort_if_request_doesnt_exists(request_id)
+        result = reqstore.get_one_request(request_id)
+        data = request.json
+        if result['status'] == settings.STATUS_P:
+            result['status'] = data['status']
+            response = {
+                'status': 'success',
+                'message': 'Successfully {} this request'.format(data['status'])
+            }
+            return response, 200
+        response = {
+            'status': 'fail',
+            'message': 'request could not be {} because it is not {}'.format(data['status'], settings.STATUS_P)
+        }
+        return response, 403

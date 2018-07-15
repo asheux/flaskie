@@ -52,6 +52,10 @@ requests = api.model('Request Model', {
     'description': fields.String(required=True, default='Slow internet connection', description='request description')
 })
 
+request_status = api.model('Request status model', {
+    'status': fields.String(required=True, default='Approved', description='Request status')
+})
+
 pagination = api.model('A page of results', {
     'page': fields.Integer(description='Number of this page of results'),
     'pages': fields.Integer(description='Total number of pages of results'),

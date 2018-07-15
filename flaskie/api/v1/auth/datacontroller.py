@@ -15,7 +15,7 @@ from flaskie.database import get_current_user
 from ..models import User, MainModel, BlackListToken, Requests
 from flaskie.database import db, blacklistdb, requestsdb
 from .serializers import Pagination
-from .errors import user_is_valid, check_valid_email, request_is_valid
+from .errors import user_is_valid, check_valid_email
 
 class UserStore:
     """The class controls the adding and fetching a user in the database"""
@@ -108,10 +108,6 @@ class UserStore:
         }
         return response, 200
 
-    def delete(self, user_id):
-        """Deletes a user from the database"""
-        del db[user_id]
-
     def save_token(self, token):
         """Saves the blacklisted token in the database"""
         blacklist_token = BlackListToken(jti=token)
@@ -161,7 +157,3 @@ class RequestStore:
         """Gets a single request by a given request id"""
         data = self.get_all_requests()
         return data[request_id]
-    
-    def delete(self, request_id):
-        """Admin deletes a request"""
-        del requestsdb[request_id]
