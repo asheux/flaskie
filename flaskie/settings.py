@@ -3,7 +3,7 @@ import os
 # Flask settings
 FLASK_SERVER_NAME = '127.0.0.1:5000'
 FLASK_DEBUG = True  # Do not use debug mode in production
-SECRET_KEY = os.getenv('SECRET_KEY', 'i love hot ladies')
+SECRET_KEY = os.getenv('SECRET_KEY')
 TESTING = True
 DEVELOPMENT = True
 
@@ -14,8 +14,16 @@ RESTPLUS_MASK_SWAGGER = True
 RESTPLUS_ERROR_404_HELP = False
 RESTPLUS_MASK_HEADER = 'Authorization'
 
-# SQLAlchemy settings
+# Database settings
 STATUS_P = 'Pending'
+STATUS_A = 'Approved'
+STATUS_R = 'Rejected'
+STATUS_S = 'Resolved'
+DATABASE_NAME = os.getenv('DATABASE_NAME')
+DATABASE_USER = os.getenv('DATABASE_USER')
+DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
+DATABASE_HOST = os.getenv('DATABASE_HOST')
+
 
 # Jwt settings
 JWT_BLACKLIST_ENABLED = True

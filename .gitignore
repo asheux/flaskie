@@ -8,3 +8,4 @@ venv
 .env-mysql
 .vscode
 .pytest_cache/
+.coverage
