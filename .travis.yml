@@ -10,7 +10,7 @@ install:
   - python setup.py develop
 
 before_script:
-  - source .travis.sh
+  - source flaskie/.travis.sh
   - psql -c "create database flaskie_test;" -U postgres
   - psql -c "create user asheuh with password 'mermaid';" -U postgres
 
