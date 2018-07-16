@@ -25,7 +25,7 @@ ns_auth = v2_api.namespace('auth', description='Authentication operations')
 ns = v2_api.namespace('user', description='User operations')
 ns_admin = v2_api.namespace('admin', description='Admin Management')
 
-@ns_auth.route('/register')
+@ns_auth.route('/registration')
 class UsersCollection(Resource):
     """This class creates a new user in the database"""
     @v2_api.doc(pagination_arguments)
@@ -35,7 +35,7 @@ class UsersCollection(Resource):
         """Creates a new user"""
         pass
 
-@ns.route('')
+@ns.route('current')
 class UserItem(Resource):
     """Show a single todo item and lets you delete them"""
     @v2_api.response(200, 'success')
@@ -45,7 +45,7 @@ class UserItem(Resource):
         """Returns a logged in user's details"""
         pass
 
-@ns.route('/<string:user_id>') 
+@ns.route('/<int:user_id>') 
 @v2_api.response(404, 'User with the given id not found')
 class ModifyUser(Resource):
     @v2_api.doc(pagination_arguments)
@@ -56,7 +56,7 @@ class ModifyUser(Resource):
         """Updates user details"""
         pass
 
-@ns_admin.route('/users', endpoint='all_users')
+@ns_admin.route('/all_users', endpoint='all_users')
 class AdminManagementResource(Resource):
     """Shows a list of all users"""
     @v2_api.doc('get list of users')
@@ -66,7 +66,7 @@ class AdminManagementResource(Resource):
         """Return list of users"""
         pass
 
-@ns_admin.route('/users/<string:user_id>', endpoint='user')
+@ns_admin.route('/all_users/<int:user_id>', endpoint='user')
 @v2_api.response(404, 'User with the given id not found')
 class AdminManagementItem(Resource):
     """Show a single todo item and lets you delete them"""
@@ -78,7 +78,7 @@ class AdminManagementItem(Resource):
         pass
         
 
-@ns_auth.route('/login')
+@ns_auth.route('/login_access')
 class UserLoginResource(Resource):
     """Login resource"""
     @v2_api.doc('login user')
@@ -88,7 +88,7 @@ class UserLoginResource(Resource):
         """Logs in a user"""
         pass
 
-@ns_auth.route('/refresh_token')
+@ns_auth.route('/token_refresh')
 class TokenRefresh(Resource):
     """Token refresh resource"""
     @jwt_refresh_token_required
@@ -99,7 +99,7 @@ class TokenRefresh(Resource):
         pass
 
 
-@ns_auth.route('/logout_access')
+@ns_auth.route('/logout')
 class UserLogoutResourceAccess(Resource):
     """Logout resource"""
     @v2_api.doc('logout user')
@@ -110,7 +110,7 @@ class UserLogoutResourceAccess(Resource):
         """Logout a user"""
         pass
     
-@ns_auth.route('/logout_refresh')
+@ns_auth.route('/logout_refresh_token')
 class UserLogoutResourceRefresh(Resource):
     """Logout refresh resource"""
     @jwt_refresh_token_required
@@ -120,7 +120,7 @@ class UserLogoutResourceRefresh(Resource):
         """Logout refresh token"""
         pass
 
-@ns.route('/requests')
+@ns.route('/my_requests')
 class UserRequestsResource(Resource):
     """Request resource endpoint"""
     @jwt_required
@@ -138,7 +138,7 @@ class UserRequestsResource(Resource):
         """get all requests for this particular user"""
         pass
 
-@ns.route('/requests/<int:request_id>')
+@ns.route('/my_requests/<int:request_id>')
 @v2_api.response(404, 'request with the given id not found')
 class UserRequestItem(Resource):
     """Single user request resource"""
@@ -159,7 +159,7 @@ class UserRequestItem(Resource):
         # abort_if_request_doesnt_exists(request_id)
         pass
     
-@ns_admin.route('/requests')
+@ns_admin.route('/all_requests')
 class AdminManageRequests(Resource):
     @jwt_required
     @v2_api.doc('Get all requests')
@@ -168,7 +168,7 @@ class AdminManageRequests(Resource):
         """Get all the request from the db"""
         pass
 
-@ns_admin.route('/requests/<int:request_id>')
+@ns_admin.route('/all_requests/<int:request_id>')
 class AdminReactsToRequest(Resource):
     """Modify a request by responsing to it"""
     @jwt_required
