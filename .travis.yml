@@ -1,13 +1,18 @@
 language: python
 python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
   - "3.6"
+
+services:
+  - postgresql
 
 install:
   - pip install -r requirements.txt
   - python setup.py develop
+
+before_script:
+  - source .travis.sh
+  - psql -c "create database flaskie_test;" -U postgres
+  - psql -c "create user asheuh with password 'mermaid';" -U postgres
 
 script:
   - py.test --cov=flaskie tests/
