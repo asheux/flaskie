@@ -8,7 +8,6 @@ services:
 install:
   - pip install -r requirements.txt
   - python setup.py develop
-  - python app.py
 
 before_script:
   - source flaskie/.travis.sh
