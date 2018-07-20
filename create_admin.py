@@ -2,17 +2,13 @@ from flask_script import Manager
 from flask import Flask
 from getpass import getpass
 import sys
-from flaskie.database import db
 from flaskie.api.v1.auth.errors import check_valid_email
-from flaskie.api.v1.models import User
-from flaskie.api.v1.auth.collections import store
+from flaskie.api.v2.models import User
 
 def main():
-    from run import app, log
+    from app import app
+    from flaskie import log
     with app.app_context():
-        create = input('Do you want to create superuser? (y/n): ')
-        if create == 'n':
-            return
         log.info('Creating superuser.....')
         counter = 0
         name = input('Enter name: ')
@@ -29,10 +25,8 @@ def main():
             main()
         else:
             user = User(name, username, email, password, admin=True)
-            admin_id = username + '00%d' % counter
-            db[admin_id] = user.toJSON()
+            user.insert()
             print('Admin created successfully')
-            print(db)
 
 if __name__ == '__main__':
     main()

@@ -12,7 +12,6 @@ from flaskie.api.v1.models import BlackListToken
 from flaskie.database import db
 from flaskie.api.v2.app.database import Database
 from flaskie.api.v1.auth.routes.userroutes import ns as user_namespace
-from flaskie.api.v2.app.resources import ns as v2_user_namespace
 
 v2_db = Database()
 logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logging.conf'))
@@ -20,6 +19,7 @@ logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
 
 def configure_app(flask_app):
+    from flaskie.api.v2.app.resources import ns as v2_user_namespace
     flask_app.config['SWAGGER_UI_DOC_EXPANSION'] = settings.RESTPLUS_SWAGGER_UI_DOC_EXPANSION
     flask_app.config['RESTPLUS_VALIDATE'] = settings.RESTPLUS_VALIDATE
     flask_app.config['RESTPLUS_MASK_SWAGGER'] = settings.RESTPLUS_MASK_SWAGGER
@@ -41,6 +41,41 @@ def initialize_app(flask_app):
     def check_if_token_in_blacklist(decrypted_token):
         jti = decrypted_token['jti']
         return BlackListToken.check_blacklist(jti)
+
+    @jwt.token_in_blacklist_loader
+    def check_token(token):
+        from flaskie.api.v2.models import BlackList
+        return BlackList.get_by_field(field='jti', value=token['jti']) is not None
+
+    @jwt.expired_token_loader
+    def token_expired():
+        response = {
+            'status': 'error',
+            'message': 'Token has expired, please login again'
+        }
+        return response, 401
+
+    @jwt.unauthorized_loader
+    def unauthorized_access(token):
+        response = {
+            'status': 'error',
+            'message': 'Missing authorization header'
+        }
+        return response, 401
+
+    @jwt.invalid_token_loader
+    def invalid_token(token):
+        response = {
+            'status': 'error',
+            'message': 'Invalid authorization token'
+        }
+        return response, 401
+    
+    @flask_app.errorhandler(404)
+    def page_not_found(e):
+        """Handles errors on the app at runtime"""
+        message = 'Resource not found on this server.'
+        return {'message': message}, 404
 
     flask_app.register_blueprint(v2_blueprint)
     flask_app.register_blueprint(blueprint)

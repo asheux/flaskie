@@ -43,7 +43,7 @@ user_register = v2_api.model('Register Model', {
 })
 
 user_login = v2_api.model('Login Model', {
-    'username': fields.String(required=True, default='paulla', description='Your username'),
+    'username': fields.String(required=True, default='asheuh', description='Your username'),
     'password': fields.String(required=True, default='mermaid', description='Your password'),
 })
 
