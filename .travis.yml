@@ -13,6 +13,11 @@ before_script:
   - source flaskie/.travis.sh
   - psql -c "create database flaskie_test;" -U postgres
   - psql -c "create user asheuh with password 'mermaid';" -U postgres
+  - psql -c "CREATE TABLE IF NOT EXISTS blacklist(
+                id serial PRIMARY KEY,
+                jti VARCHAR,
+                blacklisted_on timestamp
+            );" -U postgres
 
 script:
   - py.test --cov=flaskie tests/
