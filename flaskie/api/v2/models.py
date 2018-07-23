@@ -116,8 +116,20 @@ class User(User, DBCollector):
         )
         super().insert()
 
-class BlackList(BlackListToken, DBCollector):
+class BlackList(DBCollector):
     __table__ = "blacklist"
+
+    def __init__(self, jti, blacklisted_on=datetime.now()):
+        self.jti = jti
+        self.blacklisted_on = blacklisted_on
+
+    def toJSON(self, dictionary):
+        blacklist = BlackList()
+        blacklist.id = dictionary['id']
+        blacklist.jti = dictionary['jti']
+        blacklist.blacklisted_on = dictionary['blacklisted_on']
+        
+        return blacklist
 
     @classmethod
     def migrate(cls):
@@ -132,14 +144,6 @@ class BlackList(BlackListToken, DBCollector):
         )
         v2_db.connection.commit()
 
-    def toJSON(self, dictionary):
-        blacklist = BlackList()
-        blacklist.id = dictionary['id']
-        blacklist.jti = dictionary['jti']
-        blacklist.blacklisted_on = dictionary['blacklisted_on']
-        
-        return blacklist
-
     def insert(self):
         """save to the database"""
         v2_db.cursor.execute(
@@ -148,4 +152,4 @@ class BlackList(BlackListToken, DBCollector):
                 self.blacklisted_on
             )
         )
-        super().insert()
+        v2_db.connection.commit()
