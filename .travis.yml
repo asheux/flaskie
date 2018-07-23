@@ -17,7 +17,7 @@ before_script:
 script:
   - cd flaskie/api/v1
   - py.test --cov=flaskie tests/
-  - cd flaskie/api/v2
+  - cd ../v2
   - py.test --cov=flaskie tests/
 
 after_success:
