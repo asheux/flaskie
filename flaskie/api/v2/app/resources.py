@@ -134,7 +134,7 @@ class TokenRefresh(Resource):
             return response, 500
 
 
-@ns_auth.route('/logout')
+@ns_auth.route('/logout_user')
 class UserLogoutResourceAccess(Resource):
     """Logout resource"""
     @v2_api.doc('logout user')
