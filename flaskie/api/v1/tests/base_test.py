@@ -1,5 +1,6 @@
 from unittest import TestCase
 from flaskie import create_app
+from migrate import Migration
 from flaskie import settings
 
 class BaseTestCase(TestCase):
