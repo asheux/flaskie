@@ -148,4 +148,4 @@ class BlackList(BlackListToken, DBCollector):
                 self.blacklisted_on
             )
         )
-        v2_db.connection.commit()
+        super().insert()
