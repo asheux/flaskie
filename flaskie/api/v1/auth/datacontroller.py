@@ -114,7 +114,6 @@ class UserStore:
         try:
             # insert the token in database
             blacklistdb[self.counter] = blacklist_token.toJSON()
-            pprint.pprint(blacklistdb)
             self.counter += 1
         except Exception as e:
             response = {

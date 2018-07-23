@@ -15,6 +15,7 @@ before_script:
   - psql -c "create user asheuh with password 'mermaid';" -U postgres
 
 script:
+  - cd flaskie/api/v1
   - py.test --cov=flaskie tests/
 
 after_success:
