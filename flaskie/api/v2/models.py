@@ -28,11 +28,9 @@ class DBCollector(MainModel):
     @classmethod
     def get_by_field(cls, field, value):
         """Get an item from the database by its key or field"""
-        if cls.get_all() is None:
-            return []
-        for item in cls.get_all():
-            if item[field] == value:
-                return cls.deserialize(item)
+        v2_db.cursor.execute("SELECT * FROM {0} WHERE {1} = %s".format(cls.__table__, field), (value,))
+        items = v2_db.cursor.fetchall()
+        return [cls.deserialize(item) for item in items]
 
     @classmethod
     def get_one_by_item_field(cls, field, value):
@@ -72,6 +70,18 @@ class DBCollector(MainModel):
 class User(User, DBCollector):
     __table__ = "users"
 
+    def toJSON(self, dictionary):
+        user = User()
+        user.id = dictionary['id']
+        user.name = dictionary['name']
+        user.username = dictionary['username']
+        user.email = dictionary['email']
+        user.password_hash = dictionary['password_hash']
+        user.registered_on = dictionary['registered_on']
+        user.admin = dictionary['admin']
+
+        return user
+
     @classmethod
     def migrate(cls):
         v2_db.cursor.execute(
@@ -88,18 +98,6 @@ class User(User, DBCollector):
             """
         )
         v2_db.connection.commit()
-
-    def toJSON(self, dictionary):
-        user = User()
-        user.id = dictionary['id']
-        user.name = dictionary['name']
-        user.username = dictionary['username']
-        user.email = dictionary['email']
-        user.password_hash = dictionary['password_hash']
-        user.registered_on = dictionary['registered_on']
-        user.admin = dictionary['admin']
-
-        return user
 
     def insert(self):
         """save to the database"""
