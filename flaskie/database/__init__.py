@@ -10,9 +10,8 @@ db = {
         'username': 'paulla'
     }
 }
-blacklistdb = {}
 requestsdb = {}
-
+blacklistdb = {}
 
 @jwt_required
 def get_current_user():

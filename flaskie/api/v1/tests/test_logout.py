@@ -13,7 +13,6 @@ class TestLogout(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response_login.data.decode())
-            print(response_login.data.decode())
             self.assertTrue(response_data['status'] == 'success')
             self.assertTrue(response_data['message'] == 'Successfully logged in as Paulla Mboya')
             self.assertTrue(response_data['Authorization']['access_token'])
@@ -44,7 +43,6 @@ class TestLogout(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response_login.data.decode())
-            print(response_login.data.decode())
             self.assertTrue(response_data['status'] == 'success')
             self.assertTrue(response_data['message'] == 'Successfully logged in as Paulla Mboya')
             self.assertTrue(response_data['Authorization']['access_token'])
@@ -75,7 +73,6 @@ class TestLogout(BaseTestCase):
                 content_type='application/json'
             )
             response_data = json.loads(response_login.data.decode())
-            print(response_login.data.decode())
             self.assertTrue(response_data['status'] == 'success')
             self.assertTrue(response_data['message'] == 'Successfully logged in as Paulla Mboya')
             self.assertTrue(response_data['Authorization']['access_token'])

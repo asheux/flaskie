@@ -6,9 +6,8 @@ from flask import Flask, Blueprint
 from flask_script import Manager
 from flask_jwt_extended import JWTManager
 from flaskie import settings
-from flaskie.api.restplus import api
+from flaskie.api.restplus import api, v2_api
 from flaskie.api.restplus import blueprint, v2_blueprint
-from flaskie.api.v1.models import BlackListToken
 from flaskie.database import db
 from flaskie.api.v2.app.database import Database
 from flaskie.api.v1.auth.routes.userroutes import ns as user_namespace
@@ -36,47 +35,20 @@ def configure_app(flask_app):
 def initialize_app(flask_app):
     configure_app(flask_app)
     jwt = JWTManager(flask_app)
-    
+
     @jwt.token_in_blacklist_loader
     def check_if_token_in_blacklist(decrypted_token):
+        from flaskie.api.v1.models import BlackListToken
         jti = decrypted_token['jti']
         return BlackListToken.check_blacklist(jti)
 
     @jwt.token_in_blacklist_loader
     def check_token(token):
         from flaskie.api.v2.models import BlackList
-        return BlackList.get_one_by_item_field(field='jti', value=token['jti']) is not None
+        return BlackList.get_by_field(field='jti', value=token['jti']) is not None
 
-    @jwt.expired_token_loader
-    def token_expired():
-        response = {
-            'status': 'error',
-            'message': 'Token has expired, please login again'
-        }
-        return response, 401
-
-    @jwt.unauthorized_loader
-    def unauthorized_access(token):
-        response = {
-            'status': 'error',
-            'message': 'Missing authorization header'
-        }
-        return response, 401
-
-    @jwt.invalid_token_loader
-    def invalid_token(token):
-        response = {
-            'status': 'error',
-            'message': 'Invalid authorization token'
-        }
-        return response, 401
-    
-    @flask_app.errorhandler(404)
-    def page_not_found(e):
-        """Handles errors on the app at runtime"""
-        message = 'Resource not found on this server.'
-        return {'message': message}, 404
-
+    jwt._set_error_handler_callbacks(api)
+    jwt._set_error_handler_callbacks(v2_api)
     flask_app.register_blueprint(v2_blueprint)
     flask_app.register_blueprint(blueprint)
     v2_db.init_app(flask_app)

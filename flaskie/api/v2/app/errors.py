@@ -1,5 +1,5 @@
 import re
-from ..models import User
+from ..models import User, Requests
 from flaskie.api.restplus import api
 
 def user_is_valid(data):
@@ -15,6 +15,11 @@ def user_is_valid(data):
 def abort_if_doesnt_exists(id):
     """Checks if given id exists in the database"""
     if not User.get_by_field('id', value=id):
+        api.abort(404, "User with id {} doesn't exist or your provided an id that does not belong to you".format(id))
+
+def abort_if_requests_doesnt_exists(id):
+    """Checks if given id exists in the database"""
+    if not Requests.get_by_field('id', value=id):
         api.abort(404, "User with id {} doesn't exist or your provided an id that does not belong to you".format(id))
 
 def check_valid_email(email):

@@ -21,14 +21,21 @@ from flaskie.api.v2.app.serializers import (
     request_status
 )
 from flaskie import settings
-from flaskie.api.v2.models import User, BlackList
-from ..app.errors import check_valid_email, user_is_valid, abort_if_doesnt_exists
+from flaskie.api.v2.models import User, BlackList, Requests
+from ..app.errors import (
+    check_valid_email,
+    user_is_valid,
+    abort_if_doesnt_exists,
+    abort_if_requests_doesnt_exists
+)
+from .decorators import admin_auth
 
 flask_bcrypt = Bcrypt()
 log = logging.getLogger(__name__)
 ns_auth = v2_api.namespace('auth', description='Authentication operations')
 ns = v2_api.namespace('user', description='User operations')
 ns_admin = v2_api.namespace('admin', description='Admin Management')
+
 
 @ns_auth.route('/registration')
 class UsersCollection(Resource):
@@ -55,8 +62,8 @@ class UsersCollection(Resource):
         else:
             user = User(data['name'], data['username'], data['email'], data['password'])
             user.insert()
-            access_token = create_access_token(data['username'])
-            refresh_token = create_refresh_token(data['username'])
+            access_token = create_access_token(user.id)
+            refresh_token = create_refresh_token(user.id)
             response = {
                 'status': 'success',
                 'message': 'user created successfully',
@@ -91,8 +98,8 @@ class UserLoginResource(Resource):
                 }
                 return response, 401
             else:
-                access_token = create_access_token(user['username'])
-                refresh_token = create_refresh_token(user['username'])
+                access_token = create_access_token(user['id'])
+                refresh_token = create_refresh_token(user['id'])
                 response = {
                     'status': 'success',
                     'message': 'Successfully logged in as {}'.format(user['name']),
@@ -153,9 +160,10 @@ class UserLogoutResourceAccess(Resource):
             }
             return response, 200
         except Exception as e:
-            return {
+            response = {
                 'message': 'could not generat access token: {}'.format(e)
             }
+            return response
     
 @ns_auth.route('/logout_refresh_token')
 class UserLogoutResourceRefresh(Resource):
@@ -175,9 +183,10 @@ class UserLogoutResourceRefresh(Resource):
             }
             return response, 200
         except Exception as e:
-            return {
+            response = {
                 'message': 'could not generat refresh token: {}'.format(e)
             }
+            return response
 
 @ns.route('/current')
 class UserItem(Resource):
@@ -189,11 +198,12 @@ class UserItem(Resource):
         """Returns a logged in user's details"""
         current_user = get_jwt_identity()
         try:
-            user = User.get_by_field(field='username', value=current_user)
+            user = User.get_by_field(field='id', value=current_user)
             if user is not None:
                 response = {
                     'status': 'success',
                     'data': {
+                        'id': user['id'],
                         'name': user['name'],
                         'username': user['username'],
                         'email': user['email'],
@@ -210,9 +220,10 @@ class UserItem(Resource):
                 }
                 return response, 404
         except Exception as e:
-            return {
+            response = {
                 'message': '{}'.format(e)
             }
+            return response
 
 @ns.route('/<int:user_id>') 
 @v2_api.response(404, 'User with the given id not found')
@@ -230,6 +241,7 @@ class AdminManagementResource(Resource):
     """Shows a list of all users"""
     @v2_api.doc('get list of users')
     @jwt_required
+    @admin_auth
     @v2_api.expect(pagination_arguments)
     def get(self):
         """Return list of users"""
@@ -259,6 +271,7 @@ class AdminManagementItem(Resource):
     @v2_api.response(200, 'success')
     @v2_api.doc('get user by id')
     @jwt_required
+    @admin_auth
     def get(self, user_id):
         """Returns a user by a given id"""
         user = User.get_item_by_id(user_id)
@@ -278,14 +291,52 @@ class UserRequestsResource(Resource):
     @v2_api.expect(requests)
     def post(self):
         """Creates a new request"""
-        pass
+        data = request.json
+        try:
+            new_request = Requests(
+                data['requestname'], 
+                data['description'],
+                created_by=get_jwt_identity()
+            )
+            new_request.insert()
+
+            response = {
+                'status': 'success',
+                'message': 'Successfully created a request'
+            }
+            return response, 201
+        except Exception as e:
+            response = {
+                'status': 'fail',
+                'message': 'could not create request: {}'.format(e)
+            }
+            return response
     
     @jwt_required
     @v2_api.doc('Request resource')
     @v2_api.response(200, 'success')
     def get(self):
         """get all requests for this particular user"""
-        pass
+        args = pagination_arguments.parse_args(strict=True)
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        data = Requests.get_all()
+        requests = [req for req in data if req['created_by'] == get_jwt_identity()]
+        paginate = Pagination(page, per_page, len(requests))
+        if requests == []:
+            response = {
+                'message': 'The current user has no requests in the db'
+            }
+            return response, 404
+        response = {
+            "status": 'success',
+            "page": paginate.page,
+            "per_page": paginate.per_page,
+            "total_user": paginate.total_count,
+            "data": requests
+        }
+        return response, 200
+        
 
 @ns.route('/my_requests/<int:request_id>')
 @v2_api.response(404, 'request with the given id not found')
@@ -297,7 +348,20 @@ class UserRequestItem(Resource):
     def get(self, request_id):
         """Get a request by a specific user"""
         # abort_if_request_doesnt_exists(request_id)
-        pass
+        requestt = Requests.get_item_by_id(request_id)
+        abort_if_requests_doesnt_exists(request_id)
+        if requestt['created_by'] == get_jwt_identity():
+            response = {
+                'status': 'success',
+                'data': requestt
+            }
+            return response, 200
+        else:
+            response = {
+                'status': 'fail',
+                'message': 'You are no allowed to view or update this request'
+            }
+            return response, 401
 
     @jwt_required
     @v2_api.doc('Modify request resource')
@@ -311,16 +375,35 @@ class UserRequestItem(Resource):
 @ns_admin.route('/all_requests')
 class AdminManageRequests(Resource):
     @jwt_required
+    @admin_auth
     @v2_api.doc('Get all requests')
     @v2_api.response(200, 'success')
     def get(self):
         """Get all the request from the db"""
-        pass
+        args = pagination_arguments.parse_args(strict=True)
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        data = Requests.get_all()
+        paginate = Pagination(page, per_page, len(data))
+        if data == []:
+            response = {
+                'message': 'There are no users in the database yet'
+            }
+            return response, 404
+        response = {
+            "status": 'success',
+            "page": paginate.page,
+            "per_page": paginate.per_page,
+            "total_user": paginate.total_count,
+            "data": data
+        }
+        return response, 200
 
 @ns_admin.route('/all_requests/<int:request_id>')
 class AdminReactsToRequest(Resource):
     """Modify a request by responsing to it"""
     @jwt_required
+    @admin_auth
     @v2_api.doc('Modify a given given request for a user')
     @v2_api.response(200, 'successfully updated')
     @v2_api.expect(request_status)

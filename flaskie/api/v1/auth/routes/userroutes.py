@@ -19,7 +19,7 @@ from ..serializers import (
     requests,
     request_status
 )
-from ..collections import store, reqstore
+from ..collections import store, reqstore, blacklistdb
 from flaskie import settings
 from ..errors import abort_if_doesnt_exists, abort_if_request_doesnt_exists
 from ..authAPI import Auth
@@ -167,9 +167,10 @@ class UserLogoutResourceAccess(Resource):
             }
             return response, 200
         except Exception as e:
-            return {
+            response = {
                 'message': 'could not generate access token: {}'.format(e)
             }
+            return response
     
 @ns_auth.route('/logout_refresh')
 class UserLogoutResourceRefresh(Resource):
@@ -188,9 +189,10 @@ class UserLogoutResourceRefresh(Resource):
             }
             return response, 200
         except:
-            return {
+            response = {
                 'message': 'could not generate refresh token'
             }
+            return response
 
 @ns.route('/requests')
 class UserRequestsResource(Resource):

@@ -1,4 +1,4 @@
-from flaskie.api.v2.models import User, BlackList
+from flaskie.api.v2.models import User, BlackList, Requests
 
 class Migration:
     @staticmethod
@@ -11,9 +11,11 @@ class Migration:
         """Creates the tables"""
         User.migrate()
         BlackList.migrate()
+        Requests.migrate()
 
     @staticmethod
     def tear_down():
         """Deletes data from the the tables"""
         User.rollback()
         BlackList.rollback()
+        Requests.migrate()

@@ -1,10 +1,9 @@
 import pprint
-import json
+from flask import json, jsonify
 from flaskie.api.v1.models import (
     MainModel,
     User,
-    Requests,
-    BlackListToken
+    Requests
 )
 from datetime import datetime
 from flaskie import v2_db
@@ -28,17 +27,11 @@ class DBCollector(MainModel):
     @classmethod
     def get_by_field(cls, field, value):
         """Get an item from the database by its key or field"""
-        v2_db.cursor.execute("SELECT * FROM {0} WHERE {1} = %s".format(cls.__table__, field), (value,))
-        items = v2_db.cursor.fetchall()
-        return [cls.deserialize(item) for item in items]
-
-    @classmethod
-    def get_one_by_item_field(cls, field, value):
-        """Retrieves one item from the database by field"""
-        items = cls.get_by_field(field, value)
-        if len(items) == 0:
-            return None
-        return items[0]
+        if cls.get_all() is None:
+            return {}
+        for item in cls.get_all():
+            if item[field] == value:
+                return item
 
     @classmethod
     def get_item_by_id(cls, _id):
@@ -110,6 +103,62 @@ class User(User, DBCollector):
                 self.password_hash,
                 self.registered_on,
                 self.admin
+            )
+        )
+        super().insert()
+
+    @classmethod
+    def is_admin(cls):
+        """
+        To check if the user is an administrator
+        :return:
+        """
+        return True
+
+class Requests(Requests, DBCollector):
+    __table__ = "requests"
+
+    def toJSON(self, dictionary):
+        requests = Requests()
+        requests.created_by = dictionary['created_by']
+        requests.id = dictionary['id']
+        requests.requestname = dictionary['requestname']
+        requests.description = dictionary['description']
+        requests.date_created = dictionary['date_created']
+        requests.date_modified = dictionary['date_modified']
+        requests.status = dictionary['status']
+
+        return requests
+    
+    @classmethod
+    def migrate(cls):
+        v2_db.cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS requests(
+                created_by INTEGER,
+                id serial PRIMARY KEY,
+                requestname VARCHAR,
+                description VARCHAR,
+                date_created timestamp,
+                date_modified timestamp,
+                status VARCHAR,
+                FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+            )
+            """
+        )
+        v2_db.connection.commit()
+
+    def insert(self):
+        """save to the database"""
+        v2_db.cursor.execute(
+            "INSERT INTO requests(created_by, requestname, description,"
+            "date_created, date_modified, status) VALUES(%s, %s, %s, %s, %s, %s) RETURNING id", (
+                self.created_by,
+                self.requestname,
+                self.description,
+                self.date_created,
+                self.date_modified,
+                self.status
             )
         )
         super().insert()

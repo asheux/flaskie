@@ -26,6 +26,7 @@ api = Api(blueprint, authorizations=authorizations, version='1.0', title='User r
             "`Jwt-Extended`"
         ),
     )
+    
 v2_blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
 v2_api = Api(v2_blueprint, authorizations=authorizations, version='1.1', title='V2 of user requests API',
           description=(
@@ -40,13 +41,3 @@ v2_api = Api(v2_blueprint, authorizations=authorizations, version='1.1', title='
             "`Jwt-Extended`"
         ),
     )
-        
-
-@api.errorhandler
-def default_error_handler(e):
-    """Handles errors on the app at runtime"""
-    message = 'An unhandled exception occurred.'
-    log.exception(message)
-
-    if not settings.FLASK_DEBUG:
-        return {'message': message}, 500

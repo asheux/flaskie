@@ -6,13 +6,6 @@ from flaskie.database import blacklistdb
 
 flask_bcrypt = Bcrypt()
 
-def get_by_field(key, value):
-    if blacklistdb is None:
-        return {}
-    for item in blacklistdb.values():
-        if item[key] == value:
-            return item
-
 class MainModel:
     """This is the base model that creates common functions"""
     def toJSON(self):
@@ -61,8 +54,16 @@ class BlackListToken(MainModel):
     @classmethod
     def check_blacklist(cls, auth_token):
         """Check if the token is blacklisted"""
-        res = get_by_field(key='jti', value=auth_token)
+        res = cls.get_by_field(key='jti', value=auth_token)
         return bool(res)
+    
+    @classmethod
+    def get_by_field(cls, key, value):
+        if blacklistdb is None:
+            return {}
+        for item in blacklistdb.values():
+            if item[key] == value:
+                return item
 
 
 class Requests(MainModel):
