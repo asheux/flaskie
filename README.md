@@ -87,7 +87,7 @@ $ python setup.py develop
 
 Create super user
 ```
-flask createsuperuser
+$ flask createsuperuser
 ```
 
 Run the application
@@ -99,6 +99,7 @@ $ flask run
 
 ```
 http://127.0.0.1:5000/api/v1/
+http://127.0.0.1:5000/api/v2/
 
 ```
 ## The app is deploy to heroku with the following url
