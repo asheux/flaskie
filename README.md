@@ -85,9 +85,14 @@ Setup the application for develepment to make sure all the requiremente are inst
 $ python setup.py develop
 ```
 
+Create super user
+```
+flask createsuperuser
+```
+
 Run the application
 ```
-$ python app.py
+$ flask run
 ```
 
 ## Url for endpoints
