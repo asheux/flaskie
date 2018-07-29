@@ -60,20 +60,24 @@ class DBCollector(MainModel):
         v2_db.cursor.execute("SELECT * FROM {} WHERE id = %s".format(self.__table__), (self.id))
         v2_db.connection.commit()
 
+    def updaterequest(self, id):
+        self.date_modified = datetime.now()
+        pass
+
 class User(User, DBCollector):
     __table__ = "users"
 
-    def toJSON(self, dictionary):
-        user = User()
-        user.id = dictionary['id']
-        user.name = dictionary['name']
-        user.username = dictionary['username']
-        user.email = dictionary['email']
-        user.password_hash = dictionary['password_hash']
-        user.registered_on = dictionary['registered_on']
-        user.admin = dictionary['admin']
+    def toJSON(self):
+        user = {
+            'name': self.name,
+            'username': self.username,
+            'email': self.email,
+            'password_hash': self.password_hash,
+            'email': self.registered_on,
+            'admin': self.admin
+        }
 
-        return user
+        return self.deserialize(user)
 
     @classmethod
     def migrate(cls):
@@ -115,20 +119,34 @@ class User(User, DBCollector):
         """
         return True
 
+    def updateuser(self, _id):
+        self.registered_on = datetime.now()
+        v2_db.cursor.execute(
+            "UPDATE users SET name = %s, username = %s, email = %s,"
+            "password_hash = %s, admin = %s WHERE id = %s", (
+                self.name,
+                self.username,
+                self.email,
+                self.password_hash,
+                self.admin,
+                _id
+            )
+        )
+        v2_db.connection.commit()
+
 class Requests(Requests, DBCollector):
     __table__ = "requests"
 
-    def toJSON(self, dictionary):
-        requests = Requests()
-        requests.created_by = dictionary['created_by']
-        requests.id = dictionary['id']
-        requests.requestname = dictionary['requestname']
-        requests.description = dictionary['description']
-        requests.date_created = dictionary['date_created']
-        requests.date_modified = dictionary['date_modified']
-        requests.status = dictionary['status']
+    def toJSON(self):
+        requests = {
+            'requestname': self.requestname,
+            'description': self.description,
+            'date_created': self.date_created,
+            'date_modified': self.date_modified,
+            'status': self.status,
+        }
 
-        return requests
+        return self.deserialize(requests)
     
     @classmethod
     def migrate(cls):
@@ -162,6 +180,19 @@ class Requests(Requests, DBCollector):
             )
         )
         super().insert()
+
+    def updaterequest(self, _id):
+        super().updaterequest(_id)
+        v2_db.cursor.execute(
+            "UPDATE requests SET requestname = %s, description = %s, "
+            "status = %s, date_modified = now() WHERE id = %s", (
+                self.requestname,
+                self.description,
+                self.status,
+                _id
+            )
+        )
+        v2_db.connection.commit()
 
 class BlackList(DBCollector):
     __table__ = "blacklist"

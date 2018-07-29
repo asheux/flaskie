@@ -42,6 +42,13 @@ user_register = v2_api.model('Register Model', {
     'password': fields.String(required=True, default='mermaid', description='The users secret password'),
 })
 
+modify_user = v2_api.model('Update Model', {
+    'name': fields.String(required=True, default='Paulla Mboya', description='User fullname'),
+    'username': fields.String(required=True, default='paulla', description='Username'),
+    'email': fields.String(required=True, default='paulla@gmail.com', description='The user\'s email address'),
+})
+
+
 user_login = v2_api.model('Login Model', {
     'username': fields.String(required=True, default='asheuh', description='Your username'),
     'password': fields.String(required=True, default='mermaid', description='Your password'),
