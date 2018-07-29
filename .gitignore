@@ -4,7 +4,6 @@ __pycache__
 venv
 
 # Environment files
-.env
 .env-mysql
 .vscode
 .pytest_cache/

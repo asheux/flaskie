@@ -18,7 +18,8 @@ from flaskie.api.v2.app.serializers import (
     Pagination, 
     user_login,
     requests,
-    request_status
+    request_status,
+    modify_user
 )
 from flaskie import settings
 from flaskie.api.v2.models import User, BlackList, Requests
@@ -231,10 +232,49 @@ class ModifyUser(Resource):
     @v2_api.doc(pagination_arguments)
     @jwt_required
     @v2_api.response(200, 'User updated successfully')
-    @v2_api.expect(user_register, validate=True)
+    @v2_api.expect(modify_user, validate=True)
     def put(self, user_id):
         """Updates user details"""
-        pass
+        user = User.get_item_by_id(user_id)
+        abort_if_doesnt_exists(user_id)
+        if user['id'] != get_jwt_identity():
+            response = {
+                'status': 'fail',
+                'message': 'You are no allowed to update someone else data'
+            }
+            return response, 401
+        data = request.json
+        user['name'] = data['name']
+        user['username'] = data['username']
+        user['email'] = data['email']
+        if user['admin'] == True:
+            user = User(
+                user['name'], 
+                user['username'], 
+                user['email'],
+                password=user['password_hash'],
+                registered_on=user['registered_on'],
+                admin=True
+            )
+            user.updateuser(user_id)
+            response = {
+                'status': 'success',
+                'message': user.toJSON()
+            }
+            return response, 201
+        user = User(
+            user['name'], 
+            user['username'], 
+            user['email'],
+            password=user['password_hash'],
+            registered_on=user['registered_on']
+        )
+        user.updateuser(user_id)
+        response = {
+            'status': 'success',
+            'message': user.toJSON()
+        }
+        return response, 201
 
 @ns_admin.route('/all_users', endpoint='all_users')
 class AdminManagementResource(Resource):
@@ -370,7 +410,34 @@ class UserRequestItem(Resource):
     def put(self, request_id):
         """Modifies a request with the given id"""
         # abort_if_request_doesnt_exists(request_id)
-        pass
+        my_request = Requests.get_item_by_id(request_id)
+        abort_if_requests_doesnt_exists(request_id)
+        if my_request['created_by'] != get_jwt_identity():
+            response = {
+                'status': 'fail',
+                'message': 'You are no allowed to view or update this request'
+            }
+            return response, 401
+        elif my_request['status'] != settings.STATUS_P:
+            response = {
+                'status': 'fail',
+                'message': 'Sorry, only pending requests can be modified'
+            }
+            return response, 403
+        data = request.json
+        my_request['requestname'] = data['requestname']
+        my_request['description'] = data['description']
+        my_request = Requests(
+            my_request['requestname'], 
+            my_request['description'], 
+            date_created=my_request['date_created']
+        )
+        my_request.updaterequest(request_id)
+        response = {
+            'status': 'success',
+            'message': 'Request successfully updated'
+        }
+        return response, 201
     
 @ns_admin.route('/all_requests')
 class AdminManageRequests(Resource):
@@ -409,4 +476,36 @@ class AdminReactsToRequest(Resource):
     @v2_api.expect(request_status)
     def put(self, request_id):
         """Modify a request for a user"""
-        pass
+        req = Requests.get_item_by_id(request_id)
+        data = request.json
+        abort_if_requests_doesnt_exists(request_id)
+        valid_statuses = {
+            'approve': settings.STATUS_A,
+            'reject': settings.STATUS_R,
+            'resolve': settings.STATUS_S
+        }
+        if data['status'] not in valid_statuses.keys():
+            response = {
+                'status': 'fail',
+                'message': 'Not a valid status name, please try (approve, reject, resolve)'
+            }
+            return response, 400
+        elif data['status'] == 'approve' and req['status'] != settings.STATUS_P:
+            response = {
+                'status': 'fail',
+                'message': 'Sorry, only pending requests can be reacted on'
+            }
+            return response, 400
+        req['status'] = valid_statuses[data['status']]
+        req = Requests(
+            requestname=req['requestname'], 
+            description=req['description'], 
+            date_created=req['date_created'],
+            status=req['status']
+        )
+        req.updaterequest(request_id)
+        response = {
+            'status': 'success',
+            'message': 'Request successfully {} this request'.format(valid_statuses[data['status']])
+        }
+        return response, 201
