@@ -1,21 +1,53 @@
 import logging.config
 import os
 import sys
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from getpass import getpass
+from flask_restplus import Api
 from flask import Flask, Blueprint
 from flask_script import Manager
 from flask_jwt_extended import JWTManager
 from flaskie import settings
-from flaskie.api.restplus import api, v2_api
-from flaskie.api.restplus import blueprint, v2_blueprint
+from flaskie.api.restplus import blueprint, api, authorizations
 from flaskie.database import db
-from flaskie.api.v2.app.database import Database
 from flaskie.api.v1.auth.routes.userroutes import ns as user_namespace
+
+
+class Database:
+    connection = None
+    cursor = None
+    app = None
+
+    def init_app(self, app):
+        self.app = app
+        self.connection = psycopg2.connect(
+            dbname=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASSWORD'],
+            host=app.config['DATABASE_HOST']
+        )
+        self.cursor = self.connection.cursor(cursor_factory=RealDictCursor)
 
 v2_db = Database()
 logging_conf_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logging.conf'))
 logging.config.fileConfig(logging_conf_path)
 log = logging.getLogger(__name__)
+    
+v2_blueprint = Blueprint('api_v2', __name__, url_prefix='/api/v2')
+v2_api = Api(v2_blueprint, authorizations=authorizations, version='1.1', title='V2 of user requests API',
+          description=(
+            "An api that handles user authentication and user requests storing data in memory structure.\n\n"
+            "##Exploring the demo.\n"
+            "Create a new user at the 'POST /auth/user' endpoint. Get the user access token from the response."
+            "Click the authorize button and add the token in the following format.\n\n"
+            "`Bearer (jwt-token without the brackets)`\n\n"
+            "There is also a built-in user:\n"
+            "* `paulla` (administrator with all permissions) with password `mermaid`\n\n"
+            "## Authorization token(with the help of)\n"
+            "`Jwt-Extended`"
+        ),
+    )
 
 def configure_app(flask_app):
     from flaskie.api.v2.app.resources import ns as v2_user_namespace

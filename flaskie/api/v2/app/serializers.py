@@ -1,6 +1,6 @@
 from flask_restplus import fields
 from math import ceil
-from flaskie.api.restplus import v2_api
+from flaskie import v2_api
 
 
 class Pagination(object):

@@ -60,6 +60,10 @@ class DBCollector(MainModel):
         v2_db.cursor.execute("SELECT * FROM {} WHERE id = %s".format(self.__table__), (self.id))
         v2_db.connection.commit()
 
+    def updaterequest(self, id):
+        self.date_modified = datetime.now()
+        pass
+
 class User(User, DBCollector):
     __table__ = "users"
 
@@ -178,7 +182,7 @@ class Requests(Requests, DBCollector):
         super().insert()
 
     def updaterequest(self, _id):
-        self.date_modified = datetime.now()
+        super().updaterequest(_id)
         v2_db.cursor.execute(
             "UPDATE requests SET requestname = %s, description = %s, "
             "status = %s, date_modified = now() WHERE id = %s", (
@@ -196,6 +200,14 @@ class BlackList(DBCollector):
     def __init__(self, jti, blacklisted_on=datetime.now()):
         self.jti = jti
         self.blacklisted_on = blacklisted_on
+
+    def toJSON(self, dictionary):
+        blacklist = BlackList()
+        blacklist.id = dictionary['id']
+        blacklist.jti = dictionary['jti']
+        blacklist.blacklisted_on = dictionary['blacklisted_on']
+        
+        return blacklist
 
     @classmethod
     def migrate(cls):
