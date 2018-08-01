@@ -13,7 +13,6 @@ from flaskie.api.restplus import blueprint, api, authorizations
 from flaskie.database import db
 from flaskie.api.v1.auth.routes.userroutes import ns as user_namespace
 
-
 class Database:
     connection = None
     cursor = None
