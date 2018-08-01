@@ -6,7 +6,6 @@ FLASK_DEBUG = True  # Do not use debug mode in production
 SECRET_KEY = os.getenv('SECRET_KEY')
 TESTING = True
 DEVELOPMENT = True
-PRODUCTION = False
 
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -23,7 +22,7 @@ STATUS_S = 'Resolved'
 DATABASE_NAME = os.getenv('DATABASE_NAME')
 DATABASE_USER = os.getenv('DATABASE_USER')
 DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-DATABASE_HOST = '/tmp'
+DATABASE_HOST = os.getenv('DATABASE_HOST')
 
 # Jwt settings
 JWT_BLACKLIST_ENABLED = True
