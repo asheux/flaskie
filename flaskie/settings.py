@@ -6,6 +6,7 @@ FLASK_DEBUG = True  # Do not use debug mode in production
 SECRET_KEY = os.getenv('SECRET_KEY')
 TESTING = True
 DEVELOPMENT = True
+PRODUCTION = False
 
 # Flask-Restplus settings
 RESTPLUS_SWAGGER_UI_DOC_EXPANSION = 'list'
