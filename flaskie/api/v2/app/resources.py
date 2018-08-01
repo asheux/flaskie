@@ -11,7 +11,7 @@ from flask_jwt_extended import (
     get_raw_jwt
 )
 from flaskie.api.v1.auth.parsers import pagination_arguments
-from flaskie.api.restplus import v2_api
+from flaskie import v2_api
 from flaskie.api.v2.app.serializers import (
     user_register, 
     page_of_users, 
