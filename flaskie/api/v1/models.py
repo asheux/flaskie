@@ -71,7 +71,7 @@ class Requests(MainModel):
         requestname,
         description,
         created_by=None,
-        status=settings.STATUS_P,
+        status='Pending',
         date_created=datetime.now(), 
         date_modified=datetime.now()):
 
