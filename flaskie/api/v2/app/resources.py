@@ -235,46 +235,7 @@ class ModifyUser(Resource):
     @v2_api.expect(modify_user, validate=True)
     def put(self, user_id):
         """Updates user details"""
-        user = User.get_item_by_id(user_id)
-        abort_if_doesnt_exists(user_id)
-        if user['id'] != get_jwt_identity():
-            response = {
-                'status': 'fail',
-                'message': 'You are no allowed to update someone else data'
-            }
-            return response, 401
-        data = request.json
-        user['name'] = data['name']
-        user['username'] = data['username']
-        user['email'] = data['email']
-        if user['admin'] == True:
-            user = User(
-                user['name'], 
-                user['username'], 
-                user['email'],
-                password=user['password_hash'],
-                registered_on=user['registered_on'],
-                admin=True
-            )
-            user.updateuser(user_id)
-            response = {
-                'status': 'success',
-                'message': user.toJSON()
-            }
-            return response, 201
-        user = User(
-            user['name'], 
-            user['username'], 
-            user['email'],
-            password=user['password_hash'],
-            registered_on=user['registered_on']
-        )
-        user.updateuser(user_id)
-        response = {
-            'status': 'success',
-            'message': user.toJSON()
-        }
-        return response, 201
+        pass
 
 @ns_admin.route('/all_users', endpoint='all_users')
 class AdminManagementResource(Resource):
