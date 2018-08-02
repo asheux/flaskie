@@ -19,10 +19,7 @@ STATUS_P = 'Pending'
 STATUS_A = 'Approved'
 STATUS_R = 'Rejected'
 STATUS_S = 'Resolved'
-DATABASE_NAME = os.getenv('DATABASE_NAME')
-DATABASE_USER = os.getenv('DATABASE_USER')
-DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD')
-DATABASE_HOST = os.getenv('DATABASE_HOST')
+DATABASE_URL = os.environ('DATABASE_URL')
 
 # Jwt settings
 JWT_BLACKLIST_ENABLED = True

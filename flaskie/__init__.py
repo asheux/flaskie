@@ -61,10 +61,7 @@ def configure_app(flask_app):
     flask_app.config['JWT_BLACKLIST_ENABLED'] = settings.JWT_BLACKLIST_ENABLED
     flask_app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = settings.JWT_BLACKLIST_TOKEN_CHECKS
     flask_app.config['TESTING'] = settings.TESTING
-    flask_app.config['DATABASE_NAME'] = settings.DATABASE_NAME
-    flask_app.config['DATABASE_USER'] = settings.DATABASE_USER
-    flask_app.config['DATABASE_PASSWORD'] = settings.DATABASE_PASSWORD
-    flask_app.config['DATABASE_HOST'] = settings.DATABASE_HOST
+    flask_app.config['DATABASE_URL'] = settings.DATABASE_URL
 
 def initialize_app(flask_app):
     configure_app(flask_app)
