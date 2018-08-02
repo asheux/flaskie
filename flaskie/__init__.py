@@ -1,5 +1,6 @@
 import logging.config
 import os
+from urllib.parse import urlparse
 import sys
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -20,11 +21,13 @@ class Database:
 
     def init_app(self, app):
         self.app = app
+        self.url = urlparse(os.environ["DATABASE_URL"])
         self.connection = psycopg2.connect(
-            dbname=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASSWORD'],
-            host=app.config['DATABASE_HOST']
+            dbname=self.url.path[1:],
+            user=self.url.username,
+            password=self.url.password,
+            host=self.url.hostname,
+            port=self.url.port
         )
         self.cursor = self.connection.cursor(cursor_factory=RealDictCursor)
 
