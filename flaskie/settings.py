@@ -19,7 +19,7 @@ STATUS_P = 'Pending'
 STATUS_A = 'Approved'
 STATUS_R = 'Rejected'
 STATUS_S = 'Resolved'
-DATABASE_URL = os.environ('DATABASE_URL')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 # Jwt settings
 JWT_BLACKLIST_ENABLED = True
