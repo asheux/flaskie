@@ -7,7 +7,7 @@ def admin_auth(f):
     """Creates the admin guard decorator"""
     @wraps(f)
     def decorated(*args, **kwargs):
-        user = User.get_by_field(field='id', value=get_jwt_identity())
+        user = User.get_one_by_field(field='id', value=get_jwt_identity())
         if not user:
             return None
         if not user['admin'] == User.is_admin():

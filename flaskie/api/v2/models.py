@@ -26,12 +26,25 @@ class DBCollector(MainModel):
 
     @classmethod
     def get_by_field(cls, field, value):
-        """Get an item from the database by its key or field"""
+        """
+        Get an item from the database by its key or field
         if cls.get_all() is None:
             return {}
         for item in cls.get_all():
             if item[field] == value:
                 return item
+        """
+        v2_db.cursor.execute("SELECT * FROM {0} WHERE {1} = %s".format(cls.__table__, field), (value,))
+        items = v2_db.cursor.fetchall()
+
+        return [cls.deserialize(item) for item in items]
+    
+    @classmethod
+    def get_one_by_field(cls, field, value):
+        items = cls.get_by_field(field, value)
+        if len(items) == 0:
+            return None
+        return items[0]
 
     @classmethod
     def get_item_by_id(cls, _id):
@@ -59,10 +72,6 @@ class DBCollector(MainModel):
         """deletes an item from the database"""
         v2_db.cursor.execute("SELECT * FROM {} WHERE id = %s".format(self.__table__), (self.id))
         v2_db.connection.commit()
-
-    def updaterequest(self, id):
-        self.date_modified = datetime.now()
-        pass
 
 class User(User, DBCollector):
     __table__ = "users"
@@ -182,7 +191,7 @@ class Requests(Requests, DBCollector):
         super().insert()
 
     def updaterequest(self, _id):
-        super().updaterequest(_id)
+        self.date_modified = datetime.now()
         v2_db.cursor.execute(
             "UPDATE requests SET requestname = %s, description = %s, "
             "status = %s, date_modified = now() WHERE id = %s", (
@@ -200,14 +209,6 @@ class BlackList(DBCollector):
     def __init__(self, jti, blacklisted_on=datetime.now()):
         self.jti = jti
         self.blacklisted_on = blacklisted_on
-
-    def toJSON(self, dictionary):
-        blacklist = BlackList()
-        blacklist.id = dictionary['id']
-        blacklist.jti = dictionary['jti']
-        blacklist.blacklisted_on = dictionary['blacklisted_on']
-        
-        return blacklist
 
     @classmethod
     def migrate(cls):
