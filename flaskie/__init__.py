@@ -76,7 +76,7 @@ def initialize_app(flask_app):
     @jwt.token_in_blacklist_loader
     def check_token(token):
         from flaskie.api.v2.models import BlackList
-        return BlackList.get_by_field(field='jti', value=token['jti']) is not None
+        return BlackList.get_one_by_field(field='jti', value=token['jti']) is not None
 
     jwt._set_error_handler_callbacks(api)
     jwt._set_error_handler_callbacks(v2_api)

@@ -85,7 +85,7 @@ class UserLoginResource(Resource):
         """Logs in a user"""
         try:
             data = request.json
-            user = User.get_by_field(field='username', value=data.get('username'))
+            user = User.get_one_by_field(field='username', value=data.get('username'))
             if not user:
                 response = {
                     'status': 'fail',
@@ -199,7 +199,7 @@ class UserItem(Resource):
         """Returns a logged in user's details"""
         current_user = get_jwt_identity()
         try:
-            user = User.get_by_field(field='id', value=current_user)
+            user = User.get_one_by_field(field='id', value=current_user)
             if user is not None:
                 response = {
                     'status': 'success',
